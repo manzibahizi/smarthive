@@ -6,6 +6,7 @@ node_modules/
 .env
 .env.local
 .env.production
+env.local
 
 # Logs
 *.log
@@ -32,3 +33,6 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+
+# Render specific
+.render/
