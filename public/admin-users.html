@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Administration - Hive Nova Technologies</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css?v=2" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-gradient">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="/">Hive Nova Technologies</a>
+            <div class="ms-auto btn-group">
+                <a href="/admin/tips" class="btn btn-light btn-sm">Manage Tips</a>
+                <a href="/" class="btn btn-outline-light btn-sm">Dashboard</a>
+            </div>
+        </div>
+    </nav>
+    <div class="container py-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+            <h3 class="mb-2 mb-sm-0">User Administration</h3>
+            <div class="segmented">
+                <button id="showAdd" class="seg-btn active">New User</button>
+                <button id="showList" class="seg-btn">Existing Users</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4" id="addUserPanel">
+                <div class="card shadow-sm border-0"><div class="card-body">
+                    <h5 class="mb-3">Add User</h5>
+                    <div id="adminAlert" class="alert d-none" role="alert"></div>
+                    <form id="userForm">
+                        <div class="mb-3">
+                            <label class="form-label" for="u">Username</label>
+                            <input id="u" class="form-control" name="username" required placeholder="Username">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="p">Password</label>
+                            <input id="p" type="password" class="form-control" name="password" required placeholder="Password">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="r">Role</label>
+                            <select id="r" class="form-select" name="role">
+                                <option value="user">User</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Create User</button>
+                    </form>
+                </div></div>
+            </div>
+            <div class="col-lg-8 d-none" id="listPanel">
+                <div class="card shadow-sm border-0"><div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="mb-0">Existing Users</h5>
+                        <small class="text-muted">Compact actions to reduce clutter</small>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle" id="usersTable">
+                            <thead class="table-light"><tr><th>ID</th><th>Username</th><th>Role</th><th>Status</th><th>Created</th><th class="table-col-actions">Actions</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div></div>
+            </div>
+        </div>
+    </div>
+    <script>
+    async function loadUsers(){
+        const res = await fetch('/api/admin/users');
+        if(!res.ok){ return; }
+        const data = await res.json();
+        const tbody = document.querySelector('#usersTable tbody');
+        tbody.innerHTML = '';
+        (data.users||[]).forEach(u=>{
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${u.id}</td><td class="fw-semibold">${u.username}</td>
+                <td><select class="form-select form-select-sm roleSel"><option value="user" ${u.role==='user'?'selected':''}>User</option><option value="admin" ${u.role==='admin'?'selected':''}>Admin</option></select></td>
+                <td><select class="form-select form-select-sm activeSel"><option value="1" ${u.is_active? 'selected':''}>Active</option><option value="0" ${!u.is_active? 'selected':''}>Disabled</option></select></td>
+                <td><small class="text-muted">${u.created_at}</small></td>
+                <td>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary btn-sm save" title="Save role/status">Save</button>
+                        <button class="btn btn-outline-secondary btn-sm pwbtn" title="Set a new password">Set Password</button>
+                    </div>
+                </td>`;
+            tbody.appendChild(tr);
+            tr.querySelector('.save').addEventListener('click', async ()=>{
+                const role = tr.querySelector('.roleSel').value;
+                const is_active = tr.querySelector('.activeSel').value;
+                const fd = new FormData();
+                fd.append('role', role);
+                fd.append('is_active', is_active);
+                const res2 = await fetch(`/api/admin/users/${u.id}`, { method:'POST', body: fd });
+                if(res2.ok){ loadUsers(); }
+            });
+            tr.querySelector('.pwbtn').addEventListener('click', async ()=>{
+                const pw = prompt('Enter a new password for ' + u.username + ':') || '';
+                if(!pw) return;
+                const fd = new FormData();
+                fd.append('password', pw);
+                const res3 = await fetch(`/api/admin/users/${u.id}`, { method:'POST', body: fd });
+                if(res3.ok){ alert('Password updated'); }
+            });
+        });
+    }
+    document.getElementById('userForm').addEventListener('submit', async function(e){
+        e.preventDefault();
+        const box = document.getElementById('adminAlert');
+        box.className = 'alert d-none'; box.textContent = '';
+        const res = await fetch('/api/admin/users', { method:'POST', body: new FormData(this) });
+        if(res.ok){
+            box.className = 'alert alert-success'; box.textContent = 'User created';
+            this.reset(); loadUsers();
+        } else {
+            const d = await res.json().catch(()=>({message:'Failed'}));
+            box.className = 'alert alert-danger'; box.textContent = d.message || 'Failed';
+        }
+    });
+    loadUsers();
+
+    // Toggle panels
+    const showAddBtn = document.getElementById('showAdd');
+    const showListBtn = document.getElementById('showList');
+    const addPanel = document.getElementById('addUserPanel');
+    const listPanel = document.getElementById('listPanel');
+    function setActive(which){
+        if(which==='add'){ addPanel.classList.remove('d-none'); listPanel.classList.add('d-none'); showAddBtn.classList.add('active'); showListBtn.classList.remove('active'); }
+        else { addPanel.classList.add('d-none'); listPanel.classList.remove('d-none'); showListBtn.classList.add('active'); showAddBtn.classList.remove('active'); }
+    }
+    showAddBtn.addEventListener('click', ()=>setActive('add'));
+    showListBtn.addEventListener('click', ()=>setActive('list'));
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+

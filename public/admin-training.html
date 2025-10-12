@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Training Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/style.css?v=2" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Hive Nova Admin</a>
+            <div class="ms-auto"><a class="btn btn-outline-light btn-sm" href="/training.html">User View</a></div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3>Training Management</h3>
+            <button id="newBtn" class="btn btn-primary">New Training</button>
+        </div>
+
+        <div id="status" class="mb-3"></div>
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead><tr><th>ID</th><th>Title</th><th>Date</th><th>Published</th><th>Applicants</th><th>Actions</th></tr></thead>
+                        <tbody id="rows"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h5>Create / Edit</h5>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="fTitle" class="form-label">Title</label>
+                        <input id="fTitle" class="form-control" placeholder="Title">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="fDate" class="form-label">Date</label>
+                        <input id="fDate" type="date" class="form-control">
+                    </div>
+                    <div class="col-12">
+                        <label for="fDesc" class="form-label">Description</label>
+                        <textarea id="fDesc" class="form-control" rows="3" placeholder="Description"></textarea>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-check">
+                            <input id="fPub" class="form-check-input" type="checkbox">
+                            <label for="fPub" class="form-check-label">Published</label>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <button id="saveNew" class="btn btn-success">Save</button>
+                        <button id="update" class="btn btn-primary" disabled>Update</button>
+                        <button id="cancel" class="btn btn-secondary">Clear</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" tabindex="-1" id="appsModal">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Applicants</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="table-responsive">
+              <table class="table table-sm">
+                <thead><tr><th>User ID</th><th>Name</th><th>Phone</th><th>Email</th><th>Location</th><th>Experience</th><th>Note</th><th>Applied At</th></tr></thead>
+                <tbody id="appsRows"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function(){
+        const rows = document.getElementById('rows');
+        const status = document.getElementById('status');
+        const fTitle = document.getElementById('fTitle');
+        const fDesc = document.getElementById('fDesc');
+        const fDate = document.getElementById('fDate');
+        const fPub = document.getElementById('fPub');
+        const saveNew = document.getElementById('saveNew');
+        const updateBtn = document.getElementById('update');
+        const cancelBtn = document.getElementById('cancel');
+        const newBtn = document.getElementById('newBtn');
+        const appsRows = document.getElementById('appsRows');
+        const appsModal = new bootstrap.Modal(document.getElementById('appsModal'));
+
+        let selectedId = null;
+
+        function setStatus(msg, ok){ status.textContent = msg; status.className = ok ? 'text-success' : 'text-danger'; }
+
+        function clearForm(){ selectedId = null; fTitle.value=''; fDesc.value=''; fDate.value=''; fPub.checked=false; updateBtn.disabled=true; }
+        cancelBtn.addEventListener('click', clearForm);
+        newBtn.addEventListener('click', clearForm);
+
+        function load(){
+            fetch('/api/admin/training')
+                .then(r=>r.json())
+                .then(d=>{
+                    const list = d.resources || [];
+                    rows.innerHTML = '';
+                    list.forEach(r => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `<td>${r.id}</td><td>${r.title}</td><td>${r.date||''}</td><td>${r.published? 'Yes':'No'}</td><td>${r.applicants||0}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" data-act="edit">Edit</button>
+                            <button class="btn btn-sm btn-outline-danger ms-1" data-act="del">Delete</button>
+                            <button class="btn btn-sm btn-outline-secondary ms-1" data-act="apps">Applicants</button>
+                        </td>`;
+                        tr.querySelector('[data-act="edit"]').addEventListener('click', ()=>{
+                            selectedId = r.id; fTitle.value=r.title; fDesc.value=r.description; fDate.value=r.date||''; fPub.checked=!!r.published; updateBtn.disabled=false;
+                        });
+                        tr.querySelector('[data-act="del"]').addEventListener('click', ()=>{
+                            if(!confirm('Delete this training?')) return;
+                            fetch(`/api/admin/training/${r.id}`, { method: 'DELETE' })
+                                .then(async rr=>{ const body=await rr.json().catch(()=>({})); if(!rr.ok||body.status!=='success') throw new Error(body.message||'Delete failed'); load(); setStatus('Deleted', true); })
+                                .catch(e=> setStatus(e.message||'Delete failed', false));
+                        });
+                        tr.querySelector('[data-act="apps"]').addEventListener('click', ()=>{
+                            appsRows.innerHTML = '<tr><td colspan="4">Loading...</td></tr>';
+                            fetch(`/api/admin/training/${r.id}/applicants`).then(r=>r.json()).then(d=>{
+                                const a = d.applicants||[];
+                                appsRows.innerHTML = a.map(x=>`<tr>
+                                  <td>${x.user_id}</td>
+                                  <td>${x.user_name||''}</td>
+                                  <td>${x.phone||''}</td>
+                                  <td>${x.email||''}</td>
+                                  <td>${x.location||''}</td>
+                                  <td>${x.experience||''}</td>
+                                  <td>${x.note||''}</td>
+                                  <td>${x.applied_at||''}</td>
+                                </tr>`).join('');
+                                appsModal.show();
+                            }).catch(()=>{ appsRows.innerHTML = '<tr><td colspan="4" class="text-danger">Failed to load</td></tr>'; appsModal.show(); });
+                        });
+                        rows.appendChild(tr);
+                    });
+                })
+                .catch(()=> setStatus('Failed to load', false));
+        }
+
+        saveNew.addEventListener('click', function(){
+            const body = new URLSearchParams({ title: fTitle.value||'', description: fDesc.value||'', date: fDate.value||'', published: fPub.checked ? '1':'0' });
+            fetch('/api/admin/training', { method: 'POST', headers: { 'Content-Type':'application/x-www-form-urlencoded' }, body })
+                .then(async r=>{ const b=await r.json().catch(()=>({})); if(!r.ok||b.status!=='success') throw new Error(b.message||'Save failed'); clearForm(); load(); setStatus('Created', true); })
+                .catch(e=> setStatus(e.message||'Save failed', false));
+        });
+
+        updateBtn.addEventListener('click', function(){
+            if(!selectedId) return;
+            const body = new URLSearchParams({ title: fTitle.value||'', description: fDesc.value||'', date: fDate.value||'', published: fPub.checked ? '1':'0' });
+            fetch(`/api/admin/training/${selectedId}`, { method: 'POST', headers: { 'Content-Type':'application/x-www-form-urlencoded' }, body })
+                .then(async r=>{ const b=await r.json().catch(()=>({})); if(!r.ok||b.status!=='success') throw new Error(b.message||'Update failed'); clearForm(); load(); setStatus('Updated', true); })
+                .catch(e=> setStatus(e.message||'Update failed', false));
+        });
+
+        load();
+    });
+    </script>
+</body>
+</html>
+
+

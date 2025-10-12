@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Hive Nova Technologies</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="css/style.css?v=2" rel="stylesheet">
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <nav id="sidebar" class="bg-dark text-white">
+            <div class="sidebar-header">
+                <div class="profile-section">
+                    <div class="profile-picture-container">
+                        <img id="profilePicture" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMzAiIGZpbGw9IiNmNmFkMGIiLz4KPHN2ZyB3aWR0aD0iMzAiIGhlaWdodD0iMzAiIHZpZXdCb3g9IjAgMCAzMCAzMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSIxNSIgeT0iMTUiPgo8cGF0aCBkPSJNMTUgMTVDMTcuNzYxNCAxNSAyMCAxMi43NjE0IDIwIDEwQzIwIDcuMjM4NTggMTcuNzYxNCA1IDE1IDVDMTIuMjM4NiA1IDEwIDcuMjM4NTggMTAgMTBDMTAgMTIuNzYxNCAxMi4yMzg2IDE1IDE1IDE1WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTE1IDIwQzEwLjAyOTQgMjAgNiAyMy4wMjk0IDYgMjhIMjRDMjQgMjMuMDI5NCAxOS45NzA2IDIwIDE1IDIwWiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cjwvc3ZnPgo=" alt="Profile" class="profile-picture">
+                        <div class="profile-upload-overlay">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                        <input type="file" id="profileUpload" accept="image/*" style="display: none;">
+                    </div>
+                    <h5 id="userName" class="profile-name">Admin</h5>
+                    <small class="profile-role">Administrator</small>
+                    <a href="#" id="logoutBtn" class="logout-link-compact">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
+            </div>
+
+            <ul class="list-unstyled components">
+                <li>
+                    <a href="/" class="nav-link" aria-expanded="false">
+                        <i class="fas fa-home"></i> <span class="nav-text">Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/hives" class="nav-link" aria-expanded="false">
+                        <i class="fas fa-bug"></i> <span class="nav-text">Hives</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/weather" class="nav-link" aria-expanded="false">
+                        <i class="fas fa-cloud-sun"></i> <span class="nav-text">Weather</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/analytics" class="nav-link" aria-expanded="false">
+                        <i class="fas fa-chart-line"></i> <span class="nav-text">Analytics</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/alerts" class="nav-link" aria-expanded="false">
+                        <i class="fas fa-bell"></i> <span class="nav-text">Alerts</span>
+                        <span id="alertsBadge" class="badge bg-danger ms-auto" style="display: none;">0</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/training" class="nav-link" aria-expanded="false">
+                        <i class="fas fa-graduation-cap"></i> <span class="nav-text">Training</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/tips" class="nav-link" aria-expanded="false">
+                        <i class="fas fa-lightbulb"></i> <span class="nav-text">Tips</span>
+                    </a>
+                </li>
+                <li class="active">
+                    <a href="/settings" class="nav-link" aria-expanded="true">
+                        <i class="fas fa-cog"></i> <span class="nav-text">Settings</span>
+                    </a>
+                </li>
+                <li id="adminLink" style="display:none;">
+                    <a href="/admin/users" class="nav-link" aria-expanded="false">
+                        <i class="fas fa-users-cog"></i> <span class="nav-text">Admin</span>
+                    </a>
+                </li>
+                </ul>
+        </nav>
+
+        <!-- Page Content -->
+        <div id="content">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <div class="container-fluid">
+                    <button type="button" id="sidebarCollapse" class="btn btn-dark" aria-label="Toggle Sidebar">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="ms-auto">
+                        <span class="navbar-text">
+                            Welcome to Hive Nova Technologies
+                        </span>
+            </div>
+        </div>
+    </nav>
+
+            <div class="container-fluid">
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2><i class="fas fa-cog text-warning"></i> Settings</h2>
+                        </div>
+
+                        <!-- Settings Tabs -->
+                        <ul class="nav nav-tabs mb-4" id="settingsTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab">
+                                    <i class="fas fa-user me-2"></i>Profile
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="notifications-tab" data-bs-toggle="tab" data-bs-target="#notifications" type="button" role="tab">
+                                    <i class="fas fa-bell me-2"></i>Notifications
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="system-tab" data-bs-toggle="tab" data-bs-target="#system" type="button" role="tab">
+                                    <i class="fas fa-cogs me-2"></i>System
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab">
+                                    <i class="fas fa-shield-alt me-2"></i>Security
+                                </button>
+                            </li>
+                        </ul>
+
+                        <!-- Tab Content -->
+                        <div class="tab-content" id="settingsTabContent">
+                            <!-- Profile Tab -->
+                            <div class="tab-pane fade show active" id="profile" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="mb-0"><i class="fas fa-user-edit me-2"></i>Personal Information</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <form id="profileForm">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Full Name</label>
+                                                        <input type="text" class="form-control" id="fullName" value="Admin User">
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Email</label>
+                                                        <input type="email" class="form-control" id="email" value="admin@hivenova.com">
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Phone</label>
+                                                        <input type="tel" class="form-control" id="phone" value="+250 123 456 789">
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Location</label>
+                                                        <input type="text" class="form-control" id="location" value="Kigali, Rwanda">
+                                                    </div>
+                                                    <button type="submit" class="btn btn-primary">
+                                                        <i class="fas fa-save me-2"></i>Save Changes
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="mb-0"><i class="fas fa-image me-2"></i>Profile Picture</h5>
+                                            </div>
+                                            <div class="card-body text-center">
+                                                <div class="profile-preview mb-3">
+                                                    <img id="profilePreview" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxjaXJjbGUgY3g9IjYwIiBjeT0iNjAiIHI9IjYwIiBmaWxsPSIjZjZhZDBiIi8+Cjxzdmcgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiB2aWV3Qm94PSIwIDAgNjAgNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeD0iMzAiIHk9IjMwIj4KPHBhdGggZD0iTTMwIDMwQzM1LjUyMjggMzAgNDAgMjUuNTIyOCA0MCAyMEM0MCAxNC40NzcyIDM1LjUyMjggMTAgMzAgMTBDMjQuNDc3MiAxMCAyMCAxNC40NzcyIDIwIDIwQzIwIDI1LjUyMjggMjQuNDc3MiAzMCAzMCAzMFoiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0zMCA0MEMyMC4wNTg5IDQwIDEyIDQ4LjA1ODkgMTIgNThINDBDNDAgNDguMDU4OSAzMS45NDExIDQwIDMwIDQwWiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cjwvc3ZnPgo=" alt="Profile Preview" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover;">
+                                                </div>
+                                                <input type="file" id="profilePictureUpload" accept="image/*" class="form-control mb-3">
+                                                <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('profilePictureUpload').click()">
+                                                    <i class="fas fa-upload me-2"></i>Upload New Picture
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+        </div>
+
+                            <!-- Notifications Tab -->
+                            <div class="tab-pane fade" id="notifications" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-md-8">
+        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="mb-0"><i class="fas fa-bell me-2"></i>Notification Preferences</h5>
+                                            </div>
+            <div class="card-body">
+                <form id="notificationsForm">
+                                                    <div class="mb-4">
+                                                        <h6>Email Notifications</h6>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="emailAlerts" checked>
+                                                            <label class="form-check-label" for="emailAlerts">
+                                                                Critical alerts and warnings
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="emailReports" checked>
+                                                            <label class="form-check-label" for="emailReports">
+                                                                Weekly hive reports
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="emailUpdates">
+                                                            <label class="form-check-label" for="emailUpdates">
+                                                                System updates and maintenance
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="mb-4">
+                                                        <h6>SMS Notifications</h6>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="smsCritical" checked>
+                                                            <label class="form-check-label" for="smsCritical">
+                                                                Critical alerts only
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="smsDaily">
+                                                            <label class="form-check-label" for="smsDaily">
+                                                                Daily hive status summary
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Notification Frequency</label>
+                                                        <select class="form-select" id="frequency">
+                                                            <option value="immediate">Immediate</option>
+                                                            <option value="hourly" selected>Hourly</option>
+                                                            <option value="daily">Daily</option>
+                                                        </select>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-primary">
+                                                        <i class="fas fa-save me-2"></i>Save Preferences
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- System Tab -->
+                            <div class="tab-pane fade" id="system" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="mb-0"><i class="fas fa-cogs me-2"></i>System Preferences</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <form id="systemForm">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Language</label>
+                                                        <select class="form-select" id="language">
+                                                            <option value="en" selected>English</option>
+                                                            <option value="rw">Kinyarwanda</option>
+                                                            <option value="fr">Français</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Time Zone</label>
+                                                        <select class="form-select" id="timezone">
+                                                            <option value="Africa/Kigali" selected>Africa/Kigali (GMT+2)</option>
+                                                            <option value="UTC">UTC (GMT+0)</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Temperature Unit</label>
+                                                        <select class="form-select" id="tempUnit">
+                                                            <option value="celsius" selected>Celsius (°C)</option>
+                                                            <option value="fahrenheit">Fahrenheit (°F)</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Data Refresh Rate</label>
+                                                        <select class="form-select" id="refreshRate">
+                                                            <option value="30">30 seconds</option>
+                                                            <option value="60" selected>1 minute</option>
+                                                            <option value="300">5 minutes</option>
+                                                        </select>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-primary">
+                                                        <i class="fas fa-save me-2"></i>Save Settings
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Dashboard Preferences</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <form id="dashboardForm">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Default Dashboard View</label>
+                                                        <select class="form-select" id="dashboardView">
+                                                            <option value="overview" selected>Overview</option>
+                                                            <option value="detailed">Detailed</option>
+                                                            <option value="minimal">Minimal</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <h6>Show Charts</h6>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="showTempChart" checked>
+                                                            <label class="form-check-label" for="showTempChart">
+                                                                Temperature Chart
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="showHumidityChart" checked>
+                                                            <label class="form-check-label" for="showHumidityChart">
+                                                                Humidity Chart
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="showGasChart" checked>
+                                                            <label class="form-check-label" for="showGasChart">
+                                                                Gas Level Chart
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-primary">
+                                                        <i class="fas fa-save me-2"></i>Save Preferences
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Security Tab -->
+                            <div class="tab-pane fade" id="security" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="mb-0"><i class="fas fa-key me-2"></i>Change Password</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <form id="passwordForm">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Current Password</label>
+                                                        <input type="password" class="form-control" id="currentPassword" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">New Password</label>
+                                                        <input type="password" class="form-control" id="newPassword" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Confirm New Password</label>
+                                                        <input type="password" class="form-control" id="confirmPassword" required>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-warning">
+                                                        <i class="fas fa-key me-2"></i>Change Password
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="mb-0"><i class="fas fa-shield-alt me-2"></i>Security Settings</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <form id="securityForm">
+                    <div class="mb-3">
+                                                        <h6>Session Management</h6>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="autoLogout" checked>
+                                                            <label class="form-check-label" for="autoLogout">
+                                                                Auto-logout after 30 minutes of inactivity
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="rememberMe">
+                                                            <label class="form-check-label" for="rememberMe">
+                                                                Remember me for 7 days
+                                                            </label>
+                                                        </div>
+                    </div>
+                    <div class="mb-3">
+                                                        <h6>Two-Factor Authentication</h6>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="twoFactor">
+                                                            <label class="form-check-label" for="twoFactor">
+                                                                Enable SMS-based 2FA
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-primary">
+                                                        <i class="fas fa-save me-2"></i>Save Security Settings
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+    // Show admin link only for admins
+    fetch('/api/auth/me').then(r=>r.json()).then(d=>{
+        if(d && d.user && d.user.role === 'admin'){
+            const li = document.getElementById('adminLink');
+            if(li) li.style.display = '';
+            const li2 = document.getElementById('adminTrainingLink');
+            if(li2) li2.style.display = '';
+            const li3 = document.getElementById('adminHivesLink');
+            if(li3) li3.style.display = '';
+            const li4 = document.getElementById('adminTipsLink');
+            if(li4) li4.style.display = '';
+        }
+        
+        // Update user profile info
+        if(d && d.user) {
+            const userNameEl = document.getElementById('userName');
+            const profileRoleEl = document.querySelector('.profile-role');
+            if(userNameEl) userNameEl.textContent = d.user.username || 'User';
+            if(profileRoleEl) profileRoleEl.textContent = d.user.role === 'admin' ? 'Administrator' : 'User';
+        }
+    }).catch(()=>{});
+
+    // Profile picture upload functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const profilePicture = document.getElementById('profilePicture');
+        const profileUpload = document.getElementById('profileUpload');
+        const profileContainer = document.querySelector('.profile-picture-container');
+        const profilePreview = document.getElementById('profilePreview');
+        const profilePictureUpload = document.getElementById('profilePictureUpload');
+
+        // Load saved profile picture from localStorage
+        const savedImage = localStorage.getItem('profilePicture');
+        if (savedImage) {
+            profilePicture.src = savedImage;
+            profilePreview.src = savedImage;
+        }
+
+        // Handle profile picture click in sidebar
+        profileContainer.addEventListener('click', function() {
+            profileUpload.click();
+        });
+
+        // Handle file selection in sidebar
+        profileUpload.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    profilePicture.src = e.target.result;
+                    profilePreview.src = e.target.result;
+                    localStorage.setItem('profilePicture', e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Handle file selection in settings
+        profilePictureUpload.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    profilePreview.src = e.target.result;
+                    profilePicture.src = e.target.result;
+                    localStorage.setItem('profilePicture', e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Universal logout functionality
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', async function(e) {
+                e.preventDefault();
+                if (confirm('Are you sure you want to logout?')) {
+                    try {
+                        await fetch('/api/auth/logout', { method: 'POST' });
+                        // Clear any stored data
+                        localStorage.removeItem('profilePicture');
+                        // Redirect to login
+                        window.location.href = '/login.html';
+                    } catch (error) {
+                        console.error('Logout error:', error);
+                        // Force redirect even if API call fails
+                        window.location.href = '/login.html';
+                    }
+                }
+            });
+        }
+
+        // Form submissions
+        document.getElementById('profileForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Profile updated successfully!');
+        });
+
+        document.getElementById('notificationsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Notification preferences saved!');
+        });
+
+        document.getElementById('systemForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('System settings saved!');
+        });
+
+        document.getElementById('dashboardForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Dashboard preferences saved!');
+        });
+
+        document.getElementById('passwordForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const newPass = document.getElementById('newPassword').value;
+            const confirmPass = document.getElementById('confirmPassword').value;
+            if (newPass !== confirmPass) {
+                alert('Passwords do not match!');
+                return;
+            }
+            alert('Password changed successfully!');
+        });
+
+        document.getElementById('securityForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Security settings saved!');
+        });
+    });
+    </script>
+</body>
+</html>

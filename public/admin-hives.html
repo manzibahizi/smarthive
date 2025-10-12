@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Hives</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="css/style.css?v=2" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Hive Nova Admin</a>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3>Hives Overview</h3>
+            <div class="input-group" style="max-width:420px;">
+                <input id="q" class="form-control" placeholder="Search by name, device, owner" aria-label="Search hives">
+                <select id="statusFilter" class="form-select" style="max-width:160px;" aria-label="Filter by status">
+                    <option value="">All Status</option>
+                    <option>active</option>
+                    <option>pending</option>
+                    <option>Warning</option>
+                </select>
+                <button id="clearFilters" class="btn btn-outline-secondary">Clear</button>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-3">
+                <div class="card text-center"><div class="card-body">
+                    <div class="text-muted">Total Hives</div>
+                    <div class="h3" id="kpiTotal">--</div>
+                </div></div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center"><div class="card-body">
+                    <div class="text-muted">Active</div>
+                    <div class="h3" id="kpiActive">--</div>
+                </div></div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center"><div class="card-body">
+                    <div class="text-muted">Pending</div>
+                    <div class="h3" id="kpiPending">--</div>
+                </div></div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center"><div class="card-body">
+                    <div class="text-muted">Warnings</div>
+                    <div class="h3" id="kpiWarn">--</div>
+                </div></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Hive</th>
+                                <th>Device ID</th>
+                                <th>Owner</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Status</th>
+                                <th>Location</th>
+                                <th>Created</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rows"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function(){
+        const rows = document.getElementById('rows');
+        const q = document.getElementById('q');
+        const statusFilter = document.getElementById('statusFilter');
+        const clearFilters = document.getElementById('clearFilters');
+        const kpiTotal = document.getElementById('kpiTotal');
+        const kpiActive = document.getElementById('kpiActive');
+        const kpiPending = document.getElementById('kpiPending');
+        const kpiWarn = document.getElementById('kpiWarn');
+
+        let all = [];
+
+        function render(){
+            const term = (q.value||'').toLowerCase();
+            const st = statusFilter.value||'';
+            const filtered = all.filter(h=>{
+                const hay = `${h.name||''} ${h.device_id||''} ${h.owner_name||''} ${h.location||''}`.toLowerCase();
+                const stOk = !st || (h.status||'').toLowerCase()===st.toLowerCase();
+                return hay.includes(term) && stOk;
+            });
+            rows.innerHTML='';
+            filtered.forEach(h=>{
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${h.name||('Hive '+h.id)}</td>
+                    <td>${h.device_id||''}</td>
+                    <td>${h.owner_name||''}</td>
+                    <td>${h.owner_email||''}</td>
+                    <td>${h.owner_phone||''}</td>
+                    <td><span class="badge ${h.status==='Warning'?'bg-warning':(h.status==='active'?'bg-success':'bg-secondary')}">${h.status||''}</span></td>
+                    <td>${h.location||''}</td>
+                    <td>${(h.created_at||'').split('T')[0]||''}</td>
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-primary" href="hive-view.html?id=${h.id}">View</a>
+                        <button class="btn btn-sm btn-outline-danger ms-1" data-act="del" data-id="${h.id}">Delete</button>
+                        ${h.status!=='active'?`<button class=\"btn btn-sm btn-success ms-1\" data-act=\"approve\" data-id=\"${h.id}\">Approve</button>`:''}
+                    </td>`;
+                rows.appendChild(tr);
+                tr.querySelector('[data-act="del"]').addEventListener('click', ()=>{
+                    if(!confirm('Delete this hive?')) return;
+                    fetch(`/api/hives/${h.id}`, { method: 'DELETE' })
+                        .then(async r=>{ const b=await r.json().catch(()=>({})); if(!r.ok||b.status!=='success') throw new Error(b.message||'Delete failed'); load(); })
+                        .catch(()=>{});
+                });
+                const ap = tr.querySelector('[data-act="approve"]');
+                if (ap) {
+                    ap.addEventListener('click', ()=>{
+                        fetch(`/api/hives/${h.id}/approve`, { method: 'POST' })
+                            .then(async r=>{ const b=await r.json().catch(()=>({})); if(!r.ok||b.status!=='success') throw new Error(b.message||'Approve failed'); load(); })
+                            .catch(()=>{});
+                    });
+                }
+            });
+            // KPIs
+            kpiTotal.textContent = all.length;
+            kpiActive.textContent = all.filter(x=>x.status==='active').length;
+            kpiPending.textContent = all.filter(x=>x.status==='pending').length;
+            kpiWarn.textContent = all.filter(x=>x.status==='Warning').length;
+        }
+
+        function load(){
+            fetch('/api/hives').then(r=>r.json()).then(d=>{ all = d.hives||[]; render(); })
+                .catch(()=>{ rows.innerHTML='<tr><td colspan="7" class="text-danger">Failed to load</td></tr>'; });
+        }
+
+        q.addEventListener('input', render);
+        statusFilter.addEventListener('change', render);
+        clearFilters.addEventListener('click', ()=>{ q.value=''; statusFilter.value=''; render(); });
+
+        load();
+    });
+    </script>
+</body>
+</html>
+
+

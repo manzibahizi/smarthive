@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Beekeeping Tips</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css?v=2">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Smart Hive</a>
+        </div>
+    </nav>
+
+    <div class="container my-4">
+        <h2 class="mb-3">Manage Beekeeping Tips</h2>
+        <form id="tipForm" class="row g-3 mb-4">
+            <div class="col-md-4">
+                <label class="form-label" for="title">Title</label>
+                <input type="text" class="form-control" id="title" required placeholder="e.g., Keep bees hydrated">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="description">Description</label>
+                <input type="text" class="form-control" id="description" required placeholder="Short helpful message">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label" for="icon">Icon (emoji)</label>
+                <input type="text" class="form-control" id="icon" placeholder="🐝">
+            </div>
+            <div class="col-12">
+                <button class="btn btn-success" type="submit">Add Tip</button>
+            </div>
+        </form>
+
+        <div>
+            <h4>Existing Tips</h4>
+            <ul id="tipsList" class="list-group"></ul>
+        </div>
+    </div>
+
+    <script>
+    async function fetchTips() {
+        const res = await fetch('/api/tips');
+        const data = await res.json();
+        const list = Array.isArray(data.tips) ? data.tips : [];
+        const ul = document.getElementById('tipsList');
+        ul.innerHTML = '';
+        list.forEach(t => {
+            const li = document.createElement('li');
+            li.className = 'list-group-item';
+            li.innerHTML = `
+              <div class="row g-2 align-items-center">
+                <div class="col-md-3"><input class="form-control form-control-sm title" value="${t.title || ''}"></div>
+                <div class="col-md-6"><input class="form-control form-control-sm desc" value="${t.description || ''}"></div>
+                <div class="col-md-1"><input class="form-control form-control-sm icon" value="${t.icon || ''}"></div>
+                <div class="col-md-2 text-end">
+                    <button class="btn btn-sm btn-primary save">Save</button>
+                    <button class="btn btn-sm btn-outline-danger ms-1 del">Delete</button>
+                </div>
+              </div>`;
+            ul.appendChild(li);
+            li.querySelector('.save').addEventListener('click', async ()=>{
+                const payload = {
+                    title: li.querySelector('.title').value.trim(),
+                    description: li.querySelector('.desc').value.trim(),
+                    icon: li.querySelector('.icon').value.trim()
+                };
+                const res2 = await fetch(`/api/admin/tips/${t.id}`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+                if(res2.ok){ fetchTips(); } else { alert('Failed to update'); }
+            });
+            li.querySelector('.del').addEventListener('click', async ()=>{
+                if(!confirm('Delete this tip?')) return;
+                const res3 = await fetch(`/api/admin/tips/${t.id}`, { method:'DELETE' });
+                if(res3.ok){ fetchTips(); } else { alert('Failed to delete'); }
+            });
+        });
+    }
+
+    document.getElementById('tipForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const payload = {
+            title: document.getElementById('title').value.trim(),
+            description: document.getElementById('description').value.trim(),
+            icon: document.getElementById('icon').value.trim()
+        };
+        const res = await fetch('/api/admin/tips', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        if (res.ok) {
+            e.target.reset();
+            fetchTips();
+        } else {
+            const msg = await res.text();
+            alert('Failed to add tip: ' + msg);
+        }
+    });
+
+    fetchTips();
+    </script>
+    <script src="/js/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+

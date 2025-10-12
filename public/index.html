@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hive Nova Technologies</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="css/style.css?v=2" rel="stylesheet">
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <nav id="sidebar" class="bg-dark text-white">
+            <div class="sidebar-header">
+                <div class="profile-section">
+                    <div class="profile-picture-container">
+                        <img id="profilePicture" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMzAiIGZpbGw9IiNmNmFkMGIiLz4KPHN2ZyB3aWR0aD0iMzAiIGhlaWdodD0iMzAiIHZpZXdCb3g9IjAgMCAzMCAzMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSIxNSIgeT0iMTUiPgo8cGF0aCBkPSJNMTUgMTVDMTcuNzYxNCAxNSAyMCAxMi43NjE0IDIwIDEwQzIwIDcuMjM4NTggMTcuNzYxNCA1IDE1IDVDMTIuMjM4NiA1IDEwIDcuMjM4NTggMTAgMTBDMTAgMTIuNzYxNCAxMi4yMzg2IDE1IDE1IDE1WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTE1IDIwQzEwLjAyOTQgMjAgNiAyMy4wMjk0IDYgMjhIMjRDMjQgMjMuMDI5NCAxOS45NzA2IDIwIDE1IDIwWiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cjwvc3ZnPgo=" alt="Profile" class="profile-picture">
+                        <div class="profile-upload-overlay">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                        <input type="file" id="profileUpload" accept="image/*" style="display: none;">
+                    </div>
+                    <h5 id="userName" class="profile-name">Admin</h5>
+                    <small class="profile-role">Administrator</small>
+                    <a href="#" id="logoutBtn" class="logout-link-compact">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
+            </div>
+
+            <ul class="list-unstyled components">
+                <li class="active">
+                    <a href="/" class="nav-link" aria-expanded="true">
+                        <i class="fas fa-home"></i> <span class="nav-text">Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/hives" class="nav-link" aria-expanded="false">
+                        <i class="fas fa-bug"></i> <span class="nav-text">Hives</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/weather" class="nav-link" aria-expanded="false">
+                        <i class="fas fa-cloud-sun"></i> <span class="nav-text">Weather</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/analytics" class="nav-link" aria-expanded="false">
+                        <i class="fas fa-chart-line"></i> <span class="nav-text">Analytics</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/alerts" class="nav-link" aria-expanded="false">
+                        <i class="fas fa-bell"></i> <span class="nav-text">Alerts</span>
+                        <span id="alertsBadge" class="badge bg-danger ms-auto" style="display: none;">0</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/training" class="nav-link" aria-expanded="false">
+                        <i class="fas fa-graduation-cap"></i> <span class="nav-text">Training</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/tips" class="nav-link" aria-expanded="false">
+                        <i class="fas fa-lightbulb"></i> <span class="nav-text">Tips</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/settings" class="nav-link" aria-expanded="false">
+                        <i class="fas fa-cog"></i> <span class="nav-text">Settings</span>
+                    </a>
+                </li>
+                <li id="adminLink" style="display:none;">
+                    <a href="/admin/users" class="nav-link" aria-expanded="false">
+                        <i class="fas fa-users-cog"></i> <span class="nav-text">Admin</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Page Content -->
+        <div id="content">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <div class="container-fluid">
+                    <button type="button" id="sidebarCollapse" class="btn btn-dark" aria-label="Toggle Sidebar">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="ms-auto">
+                        <span class="navbar-text">
+                            Welcome to Hive Nova Technologies
+                        </span>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="container-fluid">
+                <!-- Dashboard Content -->
+                <div id="dashboard" class="row mt-4">
+                    <div class="col-md-3">
+                        <div class="card dashboard-card">
+                            <div class="card-body">
+                                <h6 class="card-title text-success">
+                                    <i class="fas fa-bug me-2"></i>Active Hives
+                                </h6>
+                                <h2 class="card-value text-primary"><span id="activeHivesCount">--</span></h2>
+                                <small class="text-muted">Total registered hives</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card dashboard-card">
+                            <div class="card-body">
+                                <h6 class="card-title text-success">
+                                    <i class="fas fa-thermometer-half me-2"></i>Current Temperature
+                                </h6>
+                                <h2 class="card-value text-success" id="currentTemp">--°C</h2>
+                                <small class="text-muted">Optimal range: 32°C - 36°C</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card dashboard-card">
+                            <div class="card-body">
+                                <h6 class="card-title text-success">
+                                    <i class="fas fa-tint me-2"></i>Current Humidity
+                                </h6>
+                                <h2 class="card-value text-info" id="currentHumidity">--%</h2>
+                                <small class="text-muted">Optimal range: 50% - 60%</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card dashboard-card">
+                            <div class="card-body">
+                                <h6 class="card-title text-success">
+                                    <i class="fas fa-weight me-2"></i>Current Hive Weight
+                                </h6>
+                                <h2 class="card-value text-warning" id="currentWeight">--kg</h2>
+                                <small class="text-muted">Target weight: 12kg - 20kg</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mt-3">
+                        <div class="card dashboard-card">
+                            <div class="card-body">
+                                <h6 class="card-title text-success">
+                                    <i class="fas fa-wind me-2"></i>Gas Level
+                                </h6>
+                                <h2 class="card-value text-danger"><span id="gasValue">--</span> ppm</h2>
+                                <small class="text-muted">Safe range: &lt; 200 ppm</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div id="analytics" class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Temperature Trend</h5>
+                                <canvas id="temperatureChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Hive Activity</h5>
+                                <canvas id="activityChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mt-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Gas Level (ppm)</h5>
+                                <canvas id="gasChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mt-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Humidity (%)</h5>
+                                <canvas id="humidityChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hive Status Table -->
+                <div id="hives" class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Hive Status</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Hive ID</th>
+                                                <th>Status</th>
+                                                <th>Temperature</th>
+                                                <th>Humidity</th>
+                                                <th>Weight</th>
+                                                <th>Last Updated</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Hive-001</td>
+                                                <td><span class="badge bg-success">Active</span></td>
+                                                <td>24°C</td>
+                                                <td>65%</td>
+                                                <td>45kg</td>
+                                                <td>2 mins ago</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Hive-002</td>
+                                                <td><span class="badge bg-success">Active</span></td>
+                                                <td>23°C</td>
+                                                <td>68%</td>
+                                                <td>42kg</td>
+                                                <td>2 mins ago</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Hive-003</td>
+                                                <td><span class="badge bg-warning">Warning</span></td>
+                                                <td>28°C</td>
+                                                <td>72%</td>
+                                                <td>38kg</td>
+                                                <td>2 mins ago</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weather -->
+                <div id="weather" class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Weather</h5>
+                                <div id="weatherSummary">Loading...</div>
+                                <hr>
+                                <h6 class="mb-2">Recent Alerts</h6>
+                                <div id="alertsList"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+    // Show admin link only for admins
+    fetch('/api/auth/me').then(r=>r.json()).then(d=>{
+        if(d && d.user && d.user.role === 'admin'){
+            const li = document.getElementById('adminLink');
+            if(li) li.style.display = '';
+            const li2 = document.getElementById('adminTrainingLink');
+            if(li2) li2.style.display = '';
+            const li3 = document.getElementById('adminHivesLink');
+            if(li3) li3.style.display = '';
+            const li4 = document.getElementById('adminTipsLink');
+            if(li4) li4.style.display = '';
+        }
+        
+        // Update user profile info
+        if(d && d.user) {
+            const userNameEl = document.getElementById('userName');
+            const profileRoleEl = document.querySelector('.profile-role');
+            if(userNameEl) userNameEl.textContent = d.user.username || 'User';
+            if(profileRoleEl) profileRoleEl.textContent = d.user.role === 'admin' ? 'Administrator' : 'User';
+        }
+    }).catch(()=>{});
+
+    // Profile picture upload functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const profilePicture = document.getElementById('profilePicture');
+        const profileUpload = document.getElementById('profileUpload');
+        const profileContainer = document.querySelector('.profile-picture-container');
+
+        // Load saved profile picture from localStorage
+        const savedImage = localStorage.getItem('profilePicture');
+        if (savedImage) {
+            profilePicture.src = savedImage;
+        }
+
+        // Handle profile picture click
+        profileContainer.addEventListener('click', function() {
+            profileUpload.click();
+        });
+
+        // Handle file selection
+        profileUpload.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    profilePicture.src = e.target.result;
+                    // Save to localStorage
+                    localStorage.setItem('profilePicture', e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Universal logout functionality
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', async function(e) {
+                e.preventDefault();
+                if (confirm('Are you sure you want to logout?')) {
+                    try {
+                        await fetch('/api/auth/logout', { method: 'POST' });
+                        // Clear any stored data
+                        localStorage.removeItem('profilePicture');
+                        // Redirect to login
+                        window.location.href = '/login.html';
+                    } catch (error) {
+                        console.error('Logout error:', error);
+                        // Force redirect even if API call fails
+                        window.location.href = '/login.html';
+                    }
+                }
+            });
+        }
+    });
+    </script>
+</body>
+</html> 

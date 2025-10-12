@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hive Management - Hive Nova Technologies</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="css/style.css?v=2" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Hive Nova Technologies</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample" aria-controls="navbarsExample" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarsExample">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" href="/">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="/hives">Hives</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/weather">Weather</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/analytics">Analytics</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/alerts">Alerts <span id="alertsBadge" class="badge bg-danger ms-1" style="display: none;">0</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="/settings">Settings</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/tips">Tips</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3>Hive Management</h3>
+            <a href="/" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Dashboard</a>
+        </div>
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">Your Hives</h5>
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addHiveModal"><i class="fas fa-plus"></i> Add Hive</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover" id="hivesTable">
+                        <thead>
+                            <tr>
+                                <th>Hive</th>
+                                <th>Device ID</th>
+                                <th>Location</th>
+                                <th>Status</th>
+                                <th>Temperature</th>
+                                <th>Humidity</th>
+                                <th>Weight</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- Add Hive Modal -->
+        <div class="modal fade" id="addHiveModal" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Add New Hive</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form id="addHiveForm" novalidate>
+                  <div class="mb-3">
+                    <label class="form-label" for="hName">Hive Name</label>
+                    <input id="hName" class="form-control" placeholder="e.g., Hive A" required>
+                    <div class="invalid-feedback">Name is required.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label" for="hDevice">Device ID</label>
+                    <input id="hDevice" class="form-control" placeholder="Device serial / MAC" required>
+                    <div class="invalid-feedback">Device ID is required.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label" for="hLocation">Location</label>
+                    <input id="hLocation" class="form-control" placeholder="District / Sector">
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label" for="hDesc">Description (optional)</label>
+                    <textarea id="hDesc" class="form-control" rows="2" placeholder="Notes about this hive"></textarea>
+                  </div>
+                  <div id="addHiveStatus" class="mb-2"></div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" id="addHiveSubmit">Add Hive</button>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const tbody = document.querySelector('#hivesTable tbody');
+        const modalEl = document.getElementById('addHiveModal');
+        const modal = new bootstrap.Modal(modalEl);
+        const form = document.getElementById('addHiveForm');
+        const addBtn = document.getElementById('addHiveSubmit');
+        const statusEl = document.getElementById('addHiveStatus');
+
+        function loadHives(){
+            fetch('/api/hives').then(r=>r.json()).then(d=>{
+                const list = d.hives || [];
+                tbody.innerHTML='';
+                list.forEach(h=>{
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${h.name||('Hive '+h.id)}${h.owner_name?`<div class="text-muted small">Owner: ${h.owner_name}</div>`:''}</td>
+                        <td>${h.device_id||''}</td>
+                        <td>${h.location||''}</td>
+                        <td><span class="badge ${h.status==='Warning'?'bg-warning':(h.status==='active'?'bg-success':'bg-secondary')}">${h.status||''}</span></td>
+                        <td>${h.temperature??'--'}°C</td>
+                        <td>${h.humidity??'--'}%</td>
+                        <td>${h.weight??'--'}kg</td>
+                        <td>
+                            <a class="btn btn-sm btn-primary" href="hive-view.html?id=${h.id}">View</a>
+                            <button class="btn btn-sm btn-outline-danger ms-1" data-act="del" data-id="${h.id}">Delete</button>
+                        </td>`;
+                    tbody.appendChild(tr);
+                    tr.querySelector('[data-act="del"]').addEventListener('click', ()=>{
+                        if(!confirm('Delete this hive?')) return;
+                        fetch(`/api/hives/${h.id}`, { method: 'DELETE' })
+                            .then(async r=>{ const b=await r.json().catch(()=>({})); if(!r.ok||b.status!=='success') throw new Error(b.message||'Delete failed'); loadHives(); })
+                            .catch(()=>{});
+                    });
+                });
+            }).catch(()=>{
+                tbody.innerHTML = '<tr><td colspan="8" class="text-danger">Failed to load hives</td></tr>';
+            });
+        }
+
+        addBtn.addEventListener('click', function(){
+            form.classList.add('was-validated');
+            const name = document.getElementById('hName').value.trim();
+            const device_id = document.getElementById('hDevice').value.trim();
+            const location = document.getElementById('hLocation').value.trim();
+            const description = document.getElementById('hDesc').value.trim();
+            if (!name || !device_id) return;
+            addBtn.disabled = true; statusEl.textContent='Adding...'; statusEl.className='text-muted';
+            fetch('/api/hives', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body: new URLSearchParams({ name, device_id, location, description }) })
+                .then(async r=>{ const b=await r.json().catch(()=>({})); if(!r.ok||b.status!=='success') throw new Error(b.message||'Failed');
+                    statusEl.textContent='Added'; statusEl.className='text-success';
+                    setTimeout(()=>{ modal.hide(); form.reset(); form.classList.remove('was-validated'); statusEl.textContent=''; loadHives(); }, 500);
+                })
+                .catch(e=>{ statusEl.textContent = e.message||'Failed'; statusEl.className='text-danger'; })
+                .finally(()=>{ addBtn.disabled = false; });
+        });
+
+        loadHives();
+    });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
