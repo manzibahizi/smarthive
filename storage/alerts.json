@@ -1262,5 +1262,21 @@
         "value": 201,
         "unit": "ppm",
         "created_at": "2025-10-12T22:35:52+02:00"
+    },
+    {
+        "type": "gas",
+        "level": "warning",
+        "message": "Gas level is high!",
+        "value": 220,
+        "unit": "ppm",
+        "created_at": "2025-10-12T22:37:54+02:00"
+    },
+    {
+        "type": "gas",
+        "level": "warning",
+        "message": "Gas level is high!",
+        "value": 201,
+        "unit": "ppm",
+        "created_at": "2025-10-12T22:38:55+02:00"
     }
 ]
