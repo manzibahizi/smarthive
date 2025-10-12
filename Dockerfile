@@ -17,6 +17,7 @@ RUN echo '<VirtualHost *:80>\n\
     <Directory /var/www/html/public>\n\
         AllowOverride All\n\
         Require all granted\n\
+        DirectoryIndex index.php index.html\n\
     </Directory>\n\
 </VirtualHost>' > /etc/apache2/sites-available/000-default.conf
 
