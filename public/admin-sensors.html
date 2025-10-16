@@ -278,7 +278,7 @@
                                 <button class="btn btn-sm btn-outline-warning" onclick="toggleSensorStatus('${sensor.sensor_id}', ${sensor.is_active})" title="Toggle Status">
                                     <i class="fas fa-toggle-${sensor.is_active ? 'on' : 'off'}"></i>
                                 </button>
-                                <button class="btn btn-sm btn-outline-danger" onclick="deleteSensor('${sensor.sensor_id}')" title="Delete Sensor">
+                                <button class="btn btn-sm btn-delete" onclick="deleteSensor('${sensor.sensor_id}')" title="Delete Permanently">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
@@ -458,7 +458,7 @@
                             <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">
                                 <i class="fas fa-times me-2"></i>Cancel
                             </button>
-                            <button type="button" class="btn btn-danger" id="confirmDeleteSensorBtn">
+                            <button type="button" class="btn btn-delete" id="confirmDeleteSensorBtn">
                                 <i class="fas fa-trash-alt me-2"></i>Delete Permanently
                             </button>
                         </div>

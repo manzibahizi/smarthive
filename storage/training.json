@@ -1,26 +1,12 @@
 [
     {
-        "id": 1,
-        "title": "Basic Beekeeping mnsx",
-        "description": "Intro to equipment, hive setup, and safety.",
-        "published": true,
-        "date": "2025-09-30",
-        "active": true,
-        "updated_at": "2025-10-16T05:48:10+02:00"
-    },
-    {
         "id": 2,
-        "title": "Hive Management",
+        "title": "informational way",
         "description": "Inspections, pest control, seasonal tasks.",
         "published": true,
-        "date": "2025-10-07"
-    },
-    {
-        "id": 3,
-        "title": "Hive managment",
-        "description": "everyone is allowed to apply to get new and powerful skills about hive",
-        "date": "",
-        "published": false
+        "date": "2025-10-07",
+        "active": true,
+        "updated_at": "2025-10-16T21:08:40+02:00"
     },
     {
         "id": 4,

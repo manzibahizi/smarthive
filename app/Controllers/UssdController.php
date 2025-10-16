@@ -48,7 +48,7 @@ class UssdController
                             break;
                         case '5':
                             $responseText = "Contact Support:\n";
-                            $responseText .= "Email: support@hivenova.com\n";
+                            $responseText .= "Email: support@smarthive.com\n";
                             $responseText .= "Phone: +250787626864";
                             break;
                         default:
