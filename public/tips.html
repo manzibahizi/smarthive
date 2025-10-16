@@ -11,7 +11,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/">Hive Nova Technologies</a>
+            <a class="navbar-brand" href="/">Smart Hive Solution</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample" aria-controls="navbarsExample" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -30,8 +30,21 @@
 
     <section class="py-5" style="background: linear-gradient(135deg, #ecfdf5 0%, #e0f2fe 100%); border-bottom: 1px solid rgba(17,24,39,.06)">
         <div class="container text-center">
-            <h1 class="display-6 fw-bold mb-2">Beekeeping Tips <span>🐝</span></h1>
-            <p class="text-muted mb-0">Practical advice to keep your colonies healthy and productive.</p>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div></div>
+                <div>
+                    <h1 class="display-6 fw-bold mb-2">Beekeeping Tips <span>🐝</span></h1>
+                    <p class="text-muted mb-0">Practical advice to keep your colonies healthy and productive.</p>
+                </div>
+                <div id="adminButtons" style="display: none;">
+                    <a href="/admin-tips.html" class="btn btn-success btn-sm">
+                        <i class="fas fa-plus me-1"></i>Add Tips
+                    </a>
+                    <a href="/admin-training.html" class="btn btn-primary btn-sm">
+                        <i class="fas fa-graduation-cap me-1"></i>Add Training
+                    </a>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -69,6 +82,15 @@
             });
         } catch (e) { console.error('Failed to load tips', e); }
     }
+
+    // Show admin buttons only for admins
+    fetch('/api/auth/me').then(r=>r.json()).then(d=>{
+        if(d && d.user && d.user.role === 'admin'){
+            const adminButtons = document.getElementById('adminButtons');
+            if(adminButtons) adminButtons.style.display = 'flex';
+        }
+    }).catch(()=>{});
+
     loadTips();
     </script>
     <script src="/js/main.js"></script>

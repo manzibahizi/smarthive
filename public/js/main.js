@@ -158,8 +158,20 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 const w = data.weather || {};
                 const el = document.getElementById('weatherSummary');
-                if (el) {
-                    el.textContent = `Temp: ${w.temp_c}°C, Humidity: ${w.humidity}%, ${w.condition}`;
+                if (el) {                    el.innerHTML = `
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-cloud-sun text-primary me-3 fa-2x"></i>
+                            <div>
+                                <div class="h6 mb-1">Current Conditions</div>
+                                <div class="text-muted">
+                                    <i class="fas fa-thermometer-half me-1"></i>${w.temp_c || '--'}°C | 
+                                    <i class="fas fa-tint me-1"></i>${w.humidity || '--'}% | 
+                                    <i class="fas fa-eye me-1"></i>${w.condition || 'Unknown'}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    el.className = 'alert alert-info';
                 }
                 
                 // Update individual dashboard cards
@@ -169,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const humidityEl = document.getElementById('currentHumidity');
                 if (humidityEl) humidityEl.textContent = `${w.humidity || '--'}%`;
                 
-                // Update humidity chart
+                // Update humidity chart with enhanced styling
                 if (humidityChart) {
                     const label = new Date().toLocaleTimeString();
                     humidityChart.data.labels.push(label);
@@ -178,6 +190,39 @@ document.addEventListener('DOMContentLoaded', function() {
                         humidityChart.data.labels.shift();
                         humidityChart.data.datasets[0].data.shift();
                     }
+                    
+                    // Add threshold lines for optimal humidity range
+                    humidityChart.options.plugins.annotation = {
+                        annotations: {
+                            line1: {
+                                type: 'line',
+                                yMin: 50,
+                                yMax: 50,
+                                borderColor: 'rgb(34, 197, 94)',
+                                borderWidth: 2,
+                                borderDash: [5, 5],
+                                label: {
+                                    content: 'Optimal Min (50%)',
+                                    enabled: true,
+                                    position: 'end'
+                                }
+                            },
+                            line2: {
+                                type: 'line',
+                                yMin: 60,
+                                yMax: 60,
+                                borderColor: 'rgb(34, 197, 94)',
+                                borderWidth: 2,
+                                borderDash: [5, 5],
+                                label: {
+                                    content: 'Optimal Max (60%)',
+                                    enabled: true,
+                                    position: 'end'
+                                }
+                            }
+                        }
+                    };
+                    
                     humidityChart.update();
                 }
             })
@@ -212,6 +257,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Enhanced alert system with notifications
+    let lastAlertCount = 0;
+    let notificationPermission = false;
+
+    // Request notification permission
+    if ('Notification' in window) {
+        Notification.requestPermission().then(permission => {
+            notificationPermission = permission === 'granted';
+        });
+    }
+
     // Pull alerts and surface notifications
     function fetchAlerts() {
         fetch('/api/alerts')
@@ -219,12 +275,27 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 const alerts = data.alerts || [];
                 
+                // Check for new alerts and show notifications
+                if (alerts.length > lastAlertCount && notificationPermission) {
+                    const newAlerts = alerts.slice(lastAlertCount);
+                    newAlerts.forEach(alert => {
+                        showNotification(alert);
+                    });
+                }
+                lastAlertCount = alerts.length;
+                
                 // Update alerts list on dashboard
                 const container = document.getElementById('alertsList');
                 if (container) {
                     container.innerHTML = alerts.slice(-5).reverse().map(a => `
                         <div class="alert alert-${a.level === 'critical' ? 'danger' : 'warning'} mb-2">
-                            <strong>${a.type.toUpperCase()}</strong>: ${a.message} (${a.value}${a.unit || ''})
+                            <div class="d-flex align-items-center">
+                                <i class="fas ${getAlertIcon(a.type)} me-2"></i>
+                                <div>
+                                    <strong>${a.type.toUpperCase()}</strong>: ${a.message}
+                                    <br><small class="text-muted">Value: ${a.value}${a.unit || ''} | ${getTimeAgo(a.created_at)}</small>
+                                </div>
+                            </div>
                         </div>
                     `).join('');
                 }
@@ -235,12 +306,61 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (alerts.length > 0) {
                         badge.textContent = alerts.length;
                         badge.style.display = 'inline';
+                        // Add pulsing animation for critical alerts
+                        const criticalAlerts = alerts.filter(a => a.level === 'critical');
+                        if (criticalAlerts.length > 0) {
+                            badge.classList.add('pulse');
+                        } else {
+                            badge.classList.remove('pulse');
+                        }
                     } else {
                         badge.style.display = 'none';
+                        badge.classList.remove('pulse');
                     }
                 }
             })
             .catch(() => {});
+    }
+
+    function showNotification(alert) {
+        if (!notificationPermission) return;
+        
+        const notification = new Notification(`Smart Hive Alert - ${alert.type.toUpperCase()}`, {
+            body: `${alert.message}\nValue: ${alert.value}${alert.unit || ''}`,
+            icon: '/favicon.ico',
+            tag: `alert-${alert.type}-${alert.created_at}`,
+            requireInteraction: alert.level === 'critical'
+        });
+        
+        // Auto-close after 5 seconds for warnings, 10 seconds for critical
+        setTimeout(() => {
+            notification.close();
+        }, alert.level === 'critical' ? 10000 : 5000);
+    }
+
+    function getAlertIcon(type) {
+        const icons = {
+            'temperature': 'fa-thermometer-half',
+            'humidity': 'fa-tint',
+            'gas': 'fa-wind',
+            'hive-deleted': 'fa-trash',
+            'default': 'fa-exclamation-triangle'
+        };
+        return icons[type] || icons.default;
+    }
+
+    function getTimeAgo(dateString) {
+        const now = new Date();
+        const date = new Date(dateString);
+        const diffMs = now - date;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMs / 3600000);
+        const diffDays = Math.floor(diffMs / 86400000);
+
+        if (diffMins < 1) return 'Just now';
+        if (diffMins < 60) return `${diffMins}m ago`;
+        if (diffHours < 24) return `${diffHours}h ago`;
+        return `${diffDays}d ago`;
     }
 
     // Fetch data every 1 minute

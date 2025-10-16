@@ -83,7 +83,7 @@ class AiController
             $recommendations[] = [
                 'type' => 'weight',
                 'priority' => 'high',
-                'message' => 'Low hive weight detected. Check honey stores.',
+                'message' => 'Low hive weight detected. Check hive stores and bee activity.',
                 'action' => 'Consider supplemental feeding if necessary.'
             ];
         }

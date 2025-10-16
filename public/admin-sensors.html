@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Sensor Management - Smart Hive Solution</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/style.css?v=2" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="/">Smart Hive Solution</a>
+            <div class="ms-auto">
+                <a class="btn btn-outline-primary btn-sm me-2" href="/admin/users">
+                    <i class="fas fa-users me-1"></i>Manage Users
+                </a>
+                <a class="btn btn-outline-secondary btn-sm" href="/admin/training">
+                    <i class="fas fa-graduation-cap me-1"></i>Training
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="mb-1">
+                    <i class="fas fa-microchip text-primary me-2"></i>Sensor Management
+                </h2>
+                <p class="text-muted mb-0">Register and manage IoT sensors for hive monitoring</p>
+            </div>
+            <button id="registerSensorBtn" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Register New Sensor
+            </button>
+        </div>
+
+        <div id="status" class="alert alert-dismissible fade" role="alert" style="display: none;">
+            <span id="statusMessage"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="card dashboard-card mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-plus me-2"></i>Register New Sensor
+                    </h5>
+                    <div class="text-muted small">
+                        <i class="fas fa-info-circle me-1"></i>Register sensors to start monitoring hives
+                    </div>
+                </div>
+                <form id="sensorForm">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label for="sensorId" class="form-label">
+                                <i class="fas fa-id-card me-1"></i>Sensor ID *
+                            </label>
+                            <input type="text" class="form-control" id="sensorId" required placeholder="e.g., sensor_001">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="hiveId" class="form-label">
+                                <i class="fas fa-home me-1"></i>Hive ID *
+                            </label>
+                            <input type="text" class="form-control" id="hiveId" required placeholder="e.g., hive_001">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="sensorType" class="form-label">
+                                <i class="fas fa-cog me-1"></i>Sensor Type *
+                            </label>
+                            <select class="form-select" id="sensorType" required>
+                                <option value="multi">Multi-Sensor</option>
+                                <option value="temperature">Temperature Only</option>
+                                <option value="humidity">Humidity Only</option>
+                                <option value="gas">Gas Level Only</option>
+                                <option value="weight">Weight Only</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="location" class="form-label">
+                                <i class="fas fa-map-marker-alt me-1"></i>Location
+                            </label>
+                            <input type="text" class="form-control" id="location" placeholder="e.g., Field A, Zone 1">
+                        </div>
+                        <div class="col-12">
+                            <button class="btn btn-success" type="submit">
+                                <i class="fas fa-plus me-2"></i>Register Sensor
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card dashboard-card mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-list me-2"></i>Registered Sensors
+                    </h5>
+                    <div class="text-muted small">
+                        <i class="fas fa-sync-alt me-1"></i>Auto-refresh enabled
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-id-card me-1"></i>Sensor ID</th>
+                                <th><i class="fas fa-home me-1"></i>Hive ID</th>
+                                <th><i class="fas fa-cog me-1"></i>Type</th>
+                                <th><i class="fas fa-map-marker-alt me-1"></i>Location</th>
+                                <th><i class="fas fa-toggle-on me-1"></i>Status</th>
+                                <th><i class="fas fa-clock me-1"></i>Last Update</th>
+                                <th><i class="fas fa-cog me-1"></i>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sensorsTable">
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">
+                                    <i class="fas fa-spinner fa-spin fa-2x mb-2"></i>
+                                    <p class="mb-0">Loading sensors...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card dashboard-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-line me-2"></i>Sensor Data Overview
+                    </h5>
+                    <div class="text-muted small">
+                        <i class="fas fa-info-circle me-1"></i>Real-time sensor readings
+                    </div>
+                </div>
+                <div class="row g-3" id="sensorDataOverview">
+                    <div class="col-md-3">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body text-center">
+                                <i class="fas fa-thermometer-half fa-2x mb-2"></i>
+                                <h6>Temperature</h6>
+                                <h4 id="avgTemperature">--°C</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-info text-white">
+                            <div class="card-body text-center">
+                                <i class="fas fa-tint fa-2x mb-2"></i>
+                                <h6>Humidity</h6>
+                                <h4 id="avgHumidity">--%</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-warning text-white">
+                            <div class="card-body text-center">
+                                <i class="fas fa-wind fa-2x mb-2"></i>
+                                <h6>Gas Level</h6>
+                                <h4 id="avgGasLevel">--</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-success text-white">
+                            <div class="card-body text-center">
+                                <i class="fas fa-weight fa-2x mb-2"></i>
+                                <h6>Hive Weight</h6>
+                                <h4 id="avgWeight">--kg</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sensor Details Modal -->
+    <div class="modal fade" id="sensorDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-microchip me-2"></i>Sensor Details
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" title="Close modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="sensorDetailsContent">
+                        <div class="text-center py-4">
+                            <i class="fas fa-spinner fa-spin fa-2x mb-2"></i>
+                            <p class="mb-0">Loading sensor details...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const sensorsTable = document.getElementById('sensorsTable');
+        const status = document.getElementById('status');
+        const statusMessage = document.getElementById('statusMessage');
+        const sensorForm = document.getElementById('sensorForm');
+        const sensorDetailsModal = new bootstrap.Modal(document.getElementById('sensorDetailsModal'));
+
+        function showStatus(msg, isSuccess) {
+            statusMessage.textContent = msg;
+            status.className = `alert alert-${isSuccess ? 'success' : 'danger'} alert-dismissible fade show`;
+            status.style.display = 'block';
+            
+            setTimeout(() => {
+                status.style.display = 'none';
+            }, 5000);
+        }
+
+        async function loadSensors() {
+            sensorsTable.innerHTML = `
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-4">
+                        <i class="fas fa-spinner fa-spin fa-2x mb-2"></i>
+                        <p class="mb-0">Loading sensors...</p>
+                    </td>
+                </tr>
+            `;
+            
+            try {
+                const response = await fetch('/api/admin/sensors');
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.message || 'Failed to load sensors');
+                }
+                
+                const sensors = data.sensors || [];
+                
+                if (sensors.length === 0) {
+                    sensorsTable.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-5">
+                                <i class="fas fa-microchip fa-3x mb-3 text-muted"></i>
+                                <h5 class="text-muted">No Sensors Registered</h5>
+                                <p class="mb-0">Register your first sensor to start monitoring hives.</p>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                sensorsTable.innerHTML = '';
+                sensors.forEach(sensor => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><strong>${sensor.sensor_id}</strong></td>
+                        <td><span class="badge bg-primary">${sensor.hive_id}</span></td>
+                        <td><span class="badge bg-info">${sensor.sensor_type}</span></td>
+                        <td>${sensor.location || 'Not specified'}</td>
+                        <td>
+                            <span class="badge bg-${sensor.is_active ? 'success' : 'secondary'}">
+                                <i class="fas fa-${sensor.is_active ? 'check' : 'times'} me-1"></i>
+                                ${sensor.is_active ? 'Active' : 'Inactive'}
+                            </span>
+                        </td>
+                        <td>${sensor.last_update ? new Date(sensor.last_update).toLocaleString() : 'Never'}</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-sm btn-outline-primary" onclick="viewSensorDetails('${sensor.sensor_id}')" title="View Details">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-warning" onclick="toggleSensorStatus('${sensor.sensor_id}', ${sensor.is_active})" title="Toggle Status">
+                                    <i class="fas fa-toggle-${sensor.is_active ? 'on' : 'off'}"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteSensor('${sensor.sensor_id}')" title="Delete Sensor">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    sensorsTable.appendChild(row);
+                });
+                
+            } catch (error) {
+                sensorsTable.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center text-danger py-4">
+                            <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                            <p class="mb-0">Failed to load sensors</p>
+                        </td>
+                    </tr>
+                `;
+                showStatus('Failed to load sensors: ' + error.message, false);
+            }
+        }
+
+        async function loadSensorDataOverview() {
+            try {
+                const response = await fetch('/api/admin/sensor-data-overview');
+                const data = await response.json();
+                
+                if (response.ok && data.status === 'success') {
+                    document.getElementById('avgTemperature').textContent = `${data.averages.temperature || '--'}°C`;
+                    document.getElementById('avgHumidity').textContent = `${data.averages.humidity || '--'}%`;
+                    document.getElementById('avgGasLevel').textContent = data.averages.gas_level || '--';
+                    document.getElementById('avgWeight').textContent = `${data.averages.hive_weight || '--'}kg`;
+                }
+            } catch (error) {
+                console.error('Failed to load sensor data overview:', error);
+            }
+        }
+
+        sensorForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const payload = {
+                sensor_id: document.getElementById('sensorId').value.trim(),
+                hive_id: document.getElementById('hiveId').value.trim(),
+                sensor_type: document.getElementById('sensorType').value,
+                location: document.getElementById('location').value.trim()
+            };
+            
+            if (!payload.sensor_id || !payload.hive_id) {
+                showStatus('Please fill in Sensor ID and Hive ID', false);
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/sensor/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.status === 'success') {
+                    e.target.reset();
+                    loadSensors();
+                    showStatus(`Sensor registered successfully! Sensor Key: ${result.sensor_key}`, true);
+                } else {
+                    showStatus(result.message || 'Failed to register sensor', false);
+                }
+            } catch (error) {
+                showStatus('Failed to register sensor', false);
+            }
+        });
+
+        // Global functions for sensor actions
+        window.viewSensorDetails = async function(sensorId) {
+            const content = document.getElementById('sensorDetailsContent');
+            content.innerHTML = `
+                <div class="text-center py-4">
+                    <i class="fas fa-spinner fa-spin fa-2x mb-2"></i>
+                    <p class="mb-0">Loading sensor details...</p>
+                </div>
+            `;
+            
+            sensorDetailsModal.show();
+            
+            try {
+                const response = await fetch(`/api/sensor/status?sensor_id=${sensorId}`);
+                const data = await response.json();
+                
+                if (response.ok && data.status === 'success') {
+                    const sensor = data.sensor_config;
+                    const latestData = data.latest_data;
+                    
+                    content.innerHTML = `
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-info-circle me-2"></i>Sensor Information</h6>
+                                <table class="table table-sm">
+                                    <tr><td><strong>Sensor ID:</strong></td><td>${sensor.sensor_id}</td></tr>
+                                    <tr><td><strong>Hive ID:</strong></td><td>${sensor.hive_id}</td></tr>
+                                    <tr><td><strong>Type:</strong></td><td>${sensor.sensor_type}</td></tr>
+                                    <tr><td><strong>Location:</strong></td><td>${sensor.location || 'Not specified'}</td></tr>
+                                    <tr><td><strong>Status:</strong></td><td><span class="badge bg-${sensor.is_active ? 'success' : 'secondary'}">${sensor.is_active ? 'Active' : 'Inactive'}</span></td></tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-chart-line me-2"></i>Latest Reading</h6>
+                                ${latestData ? `
+                                    <table class="table table-sm">
+                                        <tr><td><strong>Temperature:</strong></td><td>${latestData.temperature || '--'}°C</td></tr>
+                                        <tr><td><strong>Humidity:</strong></td><td>${latestData.humidity || '--'}%</td></tr>
+                                        <tr><td><strong>Gas Level:</strong></td><td>${latestData.gas_level || '--'}</td></tr>
+                                        <tr><td><strong>Hive Weight:</strong></td><td>${latestData.hive_weight || '--'}kg</td></tr>
+                                        <tr><td><strong>Battery:</strong></td><td>${latestData.battery_level || '--'}%</td></tr>
+                                        <tr><td><strong>Signal:</strong></td><td>${latestData.signal_strength || '--'}</td></tr>
+                                        <tr><td><strong>Timestamp:</strong></td><td>${new Date(latestData.timestamp).toLocaleString()}</td></tr>
+                                    </table>
+                                ` : '<p class="text-muted">No data available</p>'}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    content.innerHTML = '<p class="text-danger">Failed to load sensor details</p>';
+                }
+            } catch (error) {
+                content.innerHTML = '<p class="text-danger">Error loading sensor details</p>';
+            }
+        };
+
+        window.toggleSensorStatus = async function(sensorId, currentStatus) {
+            try {
+                const response = await fetch(`/api/admin/sensors/${sensorId}/toggle`, {
+                    method: 'POST'
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.status === 'success') {
+                    loadSensors();
+                    showStatus('Sensor status updated successfully', true);
+                } else {
+                    showStatus(result.message || 'Failed to update sensor status', false);
+                }
+            } catch (error) {
+                showStatus('Failed to update sensor status', false);
+            }
+        };
+
+        window.deleteSensor = function(sensorId) {
+            // Enhanced delete confirmation with better UI
+            const deleteModal = document.createElement('div');
+            deleteModal.className = 'modal fade';
+            deleteModal.innerHTML = `
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header bg-danger text-white">
+                            <h5 class="modal-title">
+                                <i class="fas fa-exclamation-triangle me-2"></i>Delete Sensor
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" title="Close modal"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-microchip fa-4x text-danger"></i>
+                            </div>
+                            <h5 class="text-danger mb-3">Are you sure?</h5>
+                            <p class="text-muted mb-3">
+                                You are about to delete sensor "<strong>${sensorId}</strong>". 
+                                This action cannot be undone and all sensor data will be permanently removed.
+                            </p>
+                            <div class="alert alert-warning">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Warning:</strong> This action is irreversible!
+                            </div>
+                        </div>
+                        <div class="modal-footer justify-content-center">
+                            <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </button>
+                            <button type="button" class="btn btn-danger" id="confirmDeleteSensorBtn">
+                                <i class="fas fa-trash-alt me-2"></i>Delete Permanently
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(deleteModal);
+            const modal = new bootstrap.Modal(deleteModal);
+            modal.show();
+            
+            // Handle delete confirmation
+            document.getElementById('confirmDeleteSensorBtn').addEventListener('click', async () => {
+                const btn = document.getElementById('confirmDeleteSensorBtn');
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Deleting...';
+                
+                try {
+                    const response = await fetch(`/api/admin/sensors/${sensorId}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (response.ok && result.status === 'success') {
+                        modal.hide();
+                        showStatus('Sensor deleted successfully', true);
+                        loadSensors(); // Reload the list
+                    } else {
+                        throw new Error(result.message || 'Failed to delete sensor');
+                    }
+                } catch (error) {
+                    showStatus('Failed to delete sensor: ' + error.message, false);
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-trash-alt me-2"></i>Delete Permanently';
+                }
+                
+                // Clean up modal after hiding
+                deleteModal.addEventListener('hidden.bs.modal', () => {
+                    document.body.removeChild(deleteModal);
+                });
+            });
+        };
+
+        // Load initial data
+        loadSensors();
+        loadSensorDataOverview();
+        
+        // Auto-refresh every 30 seconds
+        setInterval(() => {
+            loadSensors();
+            loadSensorDataOverview();
+        }, 30000);
+    });
+    </script>
+</body>
+</html>

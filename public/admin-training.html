@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Training Management</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="/css/style.css?v=2" rel="stylesheet">
 </head>
 <body>
@@ -34,34 +35,67 @@
             </div>
         </div>
 
-        <div class="card">
+        <div class="card dashboard-card">
             <div class="card-body">
-                <h5>Create / Edit</h5>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-edit me-2"></i>Create / Edit Training
+                    </h5>
+                    <div class="text-muted small">
+                        <i class="fas fa-info-circle me-1"></i>Fill all fields to create a new training program
+                    </div>
+                </div>
+                <form id="trainingForm">
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <label for="fTitle" class="form-label">Title</label>
-                        <input id="fTitle" class="form-control" placeholder="Title">
+                            <label for="fTitle" class="form-label">
+                                <i class="fas fa-book me-1"></i>Title *
+                            </label>
+                            <input id="fTitle" class="form-control" placeholder="e.g., Basic Beekeeping Fundamentals" required>
                     </div>
                     <div class="col-md-6">
-                        <label for="fDate" class="form-label">Date</label>
-                        <input id="fDate" type="date" class="form-control">
+                            <label for="fDate" class="form-label">
+                                <i class="fas fa-calendar me-1"></i>Training Date *
+                            </label>
+                            <input id="fDate" type="date" class="form-control" required>
                     </div>
                     <div class="col-12">
-                        <label for="fDesc" class="form-label">Description</label>
-                        <textarea id="fDesc" class="form-control" rows="3" placeholder="Description"></textarea>
+                            <label for="fDesc" class="form-label">
+                                <i class="fas fa-align-left me-1"></i>Description *
+                            </label>
+                            <textarea id="fDesc" class="form-control" rows="4" placeholder="Detailed description of the training program, topics covered, duration, etc." required></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                <input id="fPub" class="form-check-input" type="checkbox" role="switch">
+                                <label for="fPub" class="form-check-label">
+                                    <i class="fas fa-eye me-1"></i>Published (visible to users)
+                                </label>
+                            </div>
                     </div>
-                    <div class="col-12">
-                        <div class="form-check">
-                            <input id="fPub" class="form-check-input" type="checkbox">
-                            <label for="fPub" class="form-check-label">Published</label>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                <input id="fActive" class="form-check-input" type="checkbox" role="switch" checked>
+                                <label for="fActive" class="form-check-label">
+                                    <i class="fas fa-toggle-on me-1"></i>Active (accepting applications)
+                                </label>
                         </div>
                     </div>
                     <div class="col-12">
-                        <button id="saveNew" class="btn btn-success">Save</button>
-                        <button id="update" class="btn btn-primary" disabled>Update</button>
-                        <button id="cancel" class="btn btn-secondary">Clear</button>
+                            <div class="d-flex gap-2">
+                                <button id="saveNew" class="btn btn-success" type="submit">
+                                    <i class="fas fa-save me-2"></i>Create Training
+                                </button>
+                                <button id="update" class="btn btn-primary" type="button" disabled>
+                                    <i class="fas fa-edit me-2"></i>Update Training
+                                </button>
+                                <button id="cancel" class="btn btn-secondary" type="button">
+                                    <i class="fas fa-times me-2"></i>Clear Form
+                                </button>
                     </div>
                 </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -90,84 +124,295 @@
     document.addEventListener('DOMContentLoaded', function(){
         const rows = document.getElementById('rows');
         const status = document.getElementById('status');
+        const statusMessage = document.getElementById('statusMessage');
         const fTitle = document.getElementById('fTitle');
         const fDesc = document.getElementById('fDesc');
         const fDate = document.getElementById('fDate');
         const fPub = document.getElementById('fPub');
+        const fActive = document.getElementById('fActive');
         const saveNew = document.getElementById('saveNew');
         const updateBtn = document.getElementById('update');
         const cancelBtn = document.getElementById('cancel');
         const newBtn = document.getElementById('newBtn');
+        const trainingForm = document.getElementById('trainingForm');
         const appsRows = document.getElementById('appsRows');
         const appsModal = new bootstrap.Modal(document.getElementById('appsModal'));
 
         let selectedId = null;
 
-        function setStatus(msg, ok){ status.textContent = msg; status.className = ok ? 'text-success' : 'text-danger'; }
+        function showStatus(msg, isSuccess) {
+            statusMessage.textContent = msg;
+            status.className = `alert alert-${isSuccess ? 'success' : 'danger'} alert-dismissible fade show`;
+            status.style.display = 'block';
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                status.style.display = 'none';
+            }, 5000);
+        }
 
-        function clearForm(){ selectedId = null; fTitle.value=''; fDesc.value=''; fDate.value=''; fPub.checked=false; updateBtn.disabled=true; }
+        function clearForm() { 
+            selectedId = null; 
+            fTitle.value = ''; 
+            fDesc.value = ''; 
+            fDate.value = ''; 
+            fPub.checked = false; 
+            fActive.checked = true;
+            updateBtn.disabled = true; 
+            saveNew.disabled = false;
+            trainingForm.reset();
+        }
+        
         cancelBtn.addEventListener('click', clearForm);
         newBtn.addEventListener('click', clearForm);
 
         function load(){
+            rows.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-4">
+                        <i class="fas fa-spinner fa-spin fa-2x mb-2"></i>
+                        <p class="mb-0">Loading training programs...</p>
+                    </td>
+                </tr>
+            `;
+            
             fetch('/api/admin/training')
-                .then(r=>r.json())
-                .then(d=>{
-                    const list = d.resources || [];
+                .then(r => r.json())
+                .then(d => {
+                    const list = d.training || [];
                     rows.innerHTML = '';
+                    
+                    if (list.length === 0) {
+                        rows.innerHTML = `
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-5">
+                                    <i class="fas fa-graduation-cap fa-3x mb-3 text-muted"></i>
+                                    <h5 class="text-muted">No Training Programs</h5>
+                                    <p class="mb-0">Create your first training program to get started.</p>
+                                </td>
+                            </tr>
+                        `;
+                        return;
+                    }
+                    
                     list.forEach(r => {
                         const tr = document.createElement('tr');
-                        tr.innerHTML = `<td>${r.id}</td><td>${r.title}</td><td>${r.date||''}</td><td>${r.published? 'Yes':'No'}</td><td>${r.applicants||0}</td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-primary" data-act="edit">Edit</button>
-                            <button class="btn btn-sm btn-outline-danger ms-1" data-act="del">Delete</button>
-                            <button class="btn btn-sm btn-outline-secondary ms-1" data-act="apps">Applicants</button>
-                        </td>`;
-                        tr.querySelector('[data-act="edit"]').addEventListener('click', ()=>{
-                            selectedId = r.id; fTitle.value=r.title; fDesc.value=r.description; fDate.value=r.date||''; fPub.checked=!!r.published; updateBtn.disabled=false;
+                        tr.innerHTML = `
+                            <td><strong>#${r.id}</strong></td>
+                            <td>
+                                <div class="fw-bold">${r.title || 'Untitled'}</div>
+                                <small class="text-muted">${(r.description || '').substring(0, 50)}${(r.description || '').length > 50 ? '...' : ''}</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-info">${r.date || 'No date'}</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-${r.published ? 'success' : 'secondary'}">
+                                    <i class="fas fa-${r.published ? 'eye' : 'eye-slash'} me-1"></i>
+                                    ${r.published ? 'Published' : 'Draft'}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-primary">${r.applicants || 0} applicants</span>
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-sm btn-outline-primary" data-act="edit" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" data-act="del" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary" data-act="apps" title="View Applicants">
+                                        <i class="fas fa-users"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        `;
+                        
+                        tr.querySelector('[data-act="edit"]').addEventListener('click', () => {
+                            selectedId = r.id; 
+                            fTitle.value = r.title || ''; 
+                            fDesc.value = r.description || ''; 
+                            fDate.value = r.date || ''; 
+                            fPub.checked = !!r.published; 
+                            fActive.checked = r.active !== false;
+                            updateBtn.disabled = false; 
+                            saveNew.disabled = true;
+                            fTitle.scrollIntoView({ behavior: 'smooth' });
                         });
-                        tr.querySelector('[data-act="del"]').addEventListener('click', ()=>{
-                            if(!confirm('Delete this training?')) return;
-                            fetch(`/api/admin/training/${r.id}`, { method: 'DELETE' })
-                                .then(async rr=>{ const body=await rr.json().catch(()=>({})); if(!rr.ok||body.status!=='success') throw new Error(body.message||'Delete failed'); load(); setStatus('Deleted', true); })
-                                .catch(e=> setStatus(e.message||'Delete failed', false));
+                        
+                        tr.querySelector('[data-act="del"]').addEventListener('click', () => {
+                            // Enhanced delete confirmation with better UI
+                            const deleteModal = document.createElement('div');
+                            deleteModal.className = 'modal fade';
+                            deleteModal.innerHTML = `
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header bg-danger text-white">
+                                            <h5 class="modal-title">
+                                                <i class="fas fa-exclamation-triangle me-2"></i>Delete Training Program
+                                            </h5>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body text-center">
+                                            <div class="mb-3">
+                                                <i class="fas fa-trash-alt fa-4x text-danger"></i>
+                                            </div>
+                                            <h5 class="text-danger mb-3">Are you sure?</h5>
+                                            <p class="text-muted mb-3">
+                                                You are about to delete "<strong>${r.title}</strong>". 
+                                                This action cannot be undone and all associated data will be permanently removed.
+                                            </p>
+                                            <div class="alert alert-warning">
+                                                <i class="fas fa-info-circle me-2"></i>
+                                                <strong>Warning:</strong> This action is irreversible!
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer justify-content-center">
+                                            <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">
+                                                <i class="fas fa-times me-2"></i>Cancel
+                                            </button>
+                                            <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                                                <i class="fas fa-trash-alt me-2"></i>Delete Permanently
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                            
+                            document.body.appendChild(deleteModal);
+                            const modal = new bootstrap.Modal(deleteModal);
+                            modal.show();
+                            
+                            // Handle delete confirmation
+                            document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+                                const btn = document.getElementById('confirmDeleteBtn');
+                                btn.disabled = true;
+                                btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Deleting...';
+                                
+                                try {
+                                    const response = await fetch(`/api/admin/training/${r.id}`, { method: 'DELETE' });
+                                    const body = await response.json().catch(() => ({}));
+                                    
+                                    if (!response.ok || body.status !== 'success') {
+                                        throw new Error(body.message || 'Delete failed');
+                                    }
+                                    
+                                    modal.hide();
+                                    showStatus('Training program deleted successfully!', true);
+                                    load(); // Reload the list
+                                    
+                                } catch (error) {
+                                    showStatus('Delete failed: ' + error.message, false);
+                                    btn.disabled = false;
+                                    btn.innerHTML = '<i class="fas fa-trash-alt me-2"></i>Delete Permanently';
+                                }
+                                
+                                // Clean up modal after hiding
+                                deleteModal.addEventListener('hidden.bs.modal', () => {
+                                    document.body.removeChild(deleteModal);
+                                });
+                            });
                         });
-                        tr.querySelector('[data-act="apps"]').addEventListener('click', ()=>{
-                            appsRows.innerHTML = '<tr><td colspan="4">Loading...</td></tr>';
-                            fetch(`/api/admin/training/${r.id}/applicants`).then(r=>r.json()).then(d=>{
-                                const a = d.applicants||[];
-                                appsRows.innerHTML = a.map(x=>`<tr>
-                                  <td>${x.user_id}</td>
-                                  <td>${x.user_name||''}</td>
-                                  <td>${x.phone||''}</td>
-                                  <td>${x.email||''}</td>
-                                  <td>${x.location||''}</td>
-                                  <td>${x.experience||''}</td>
-                                  <td>${x.note||''}</td>
-                                  <td>${x.applied_at||''}</td>
-                                </tr>`).join('');
+                        
+                        tr.querySelector('[data-act="apps"]').addEventListener('click', () => {
+                            appsRows.innerHTML = '<tr><td colspan="8" class="text-center py-3"><i class="fas fa-spinner fa-spin me-2"></i>Loading applicants...</td></tr>';
                                 appsModal.show();
-                            }).catch(()=>{ appsRows.innerHTML = '<tr><td colspan="4" class="text-danger">Failed to load</td></tr>'; appsModal.show(); });
+                            
+                            fetch(`/api/admin/training/${r.id}/applicants`)
+                                .then(r => r.json())
+                                .then(d => {
+                                    const a = d.applicants || [];
+                                    if (a.length === 0) {
+                                        appsRows.innerHTML = '<tr><td colspan="8" class="text-center text-muted py-4">No applicants yet</td></tr>';
+                                    } else {
+                                        appsRows.innerHTML = a.map(x => `
+                                            <tr>
+                                                <td>${x.user_id || ''}</td>
+                                                <td>${x.user_name || ''}</td>
+                                                <td>${x.phone || ''}</td>
+                                                <td>${x.email || ''}</td>
+                                                <td>${x.location || ''}</td>
+                                                <td>${x.experience || ''}</td>
+                                                <td>${x.note || ''}</td>
+                                                <td>${x.applied_at || ''}</td>
+                                            </tr>
+                                        `).join('');
+                                    }
+                                })
+                                .catch(() => { 
+                                    appsRows.innerHTML = '<tr><td colspan="8" class="text-center text-danger py-3">Failed to load applicants</td></tr>'; 
+                                });
                         });
+                        
                         rows.appendChild(tr);
                     });
                 })
-                .catch(()=> setStatus('Failed to load', false));
+                .catch(() => showStatus('Failed to load training programs', false));
         }
 
-        saveNew.addEventListener('click', function(){
-            const body = new URLSearchParams({ title: fTitle.value||'', description: fDesc.value||'', date: fDate.value||'', published: fPub.checked ? '1':'0' });
-            fetch('/api/admin/training', { method: 'POST', headers: { 'Content-Type':'application/x-www-form-urlencoded' }, body })
-                .then(async r=>{ const b=await r.json().catch(()=>({})); if(!r.ok||b.status!=='success') throw new Error(b.message||'Save failed'); clearForm(); load(); setStatus('Created', true); })
-                .catch(e=> setStatus(e.message||'Save failed', false));
+        // Form submission handler
+        trainingForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!fTitle.value.trim() || !fDesc.value.trim() || !fDate.value) {
+                showStatus('Please fill in all required fields', false);
+                return;
+            }
+            
+            const payload = {
+                title: fTitle.value.trim(),
+                description: fDesc.value.trim(),
+                date: fDate.value,
+                published: fPub.checked,
+                active: fActive.checked
+            };
+            
+            fetch('/api/admin/training', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(payload) 
+            })
+            .then(async r => { 
+                const b = await r.json().catch(() => ({})); 
+                if(!r.ok || b.status !== 'success') throw new Error(b.message || 'Save failed'); 
+                clearForm(); 
+                load(); 
+                showStatus('Training program created successfully!', true); 
+            })
+            .catch(e => showStatus(e.message || 'Save failed', false));
         });
 
         updateBtn.addEventListener('click', function(){
             if(!selectedId) return;
-            const body = new URLSearchParams({ title: fTitle.value||'', description: fDesc.value||'', date: fDate.value||'', published: fPub.checked ? '1':'0' });
-            fetch(`/api/admin/training/${selectedId}`, { method: 'POST', headers: { 'Content-Type':'application/x-www-form-urlencoded' }, body })
-                .then(async r=>{ const b=await r.json().catch(()=>({})); if(!r.ok||b.status!=='success') throw new Error(b.message||'Update failed'); clearForm(); load(); setStatus('Updated', true); })
-                .catch(e=> setStatus(e.message||'Update failed', false));
+            
+            if (!fTitle.value.trim() || !fDesc.value.trim() || !fDate.value) {
+                showStatus('Please fill in all required fields', false);
+                return;
+            }
+            
+            const payload = {
+                title: fTitle.value.trim(),
+                description: fDesc.value.trim(),
+                date: fDate.value,
+                published: fPub.checked,
+                active: fActive.checked
+            };
+            
+            fetch(`/api/admin/training/${selectedId}`, { 
+                method: 'PUT', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(payload) 
+            })
+            .then(async r => { 
+                const b = await r.json().catch(() => ({})); 
+                if(!r.ok || b.status !== 'success') throw new Error(b.message || 'Update failed'); 
+                clearForm(); 
+                load(); 
+                showStatus('Training program updated successfully!', true); 
+            })
+            .catch(e => showStatus(e.message || 'Update failed', false));
         });
 
         load();

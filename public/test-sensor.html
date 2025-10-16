@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Sensor Data - Smart Hive Solution</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/style.css?v=2" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="/">Smart Hive Solution</a>
+            <div class="ms-auto">
+                <a class="btn btn-outline-primary btn-sm me-2" href="/setup.html">
+                    <i class="fas fa-rocket me-1"></i>Quick Setup
+                </a>
+                <a class="btn btn-outline-secondary btn-sm" href="/">
+                    <i class="fas fa-home me-1"></i>Dashboard
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="text-center mb-4">
+                    <h2 class="mb-3">
+                        <i class="fas fa-flask text-primary me-2"></i>Test Sensor Data
+                    </h2>
+                    <p class="text-muted">Send test sensor data to verify your system is working correctly</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <form id="testSensorForm">
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label for="sensorId" class="form-label">
+                                        <i class="fas fa-microchip me-1"></i>Sensor ID
+                                    </label>
+                                    <input type="text" class="form-control" id="sensorId" value="test_sensor_001" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="sensorKey" class="form-label">
+                                        <i class="fas fa-key me-1"></i>Sensor Key
+                                    </label>
+                                    <input type="text" class="form-control" id="sensorKey" placeholder="Enter sensor key from admin panel" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="hiveId" class="form-label">
+                                        <i class="fas fa-home me-1"></i>Hive ID
+                                    </label>
+                                    <input type="text" class="form-control" id="hiveId" value="test_hive_001" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="temperature" class="form-label">
+                                        <i class="fas fa-thermometer-half me-1"></i>Temperature (°C)
+                                    </label>
+                                    <input type="number" class="form-control" id="temperature" step="0.1" value="25.5" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="humidity" class="form-label">
+                                        <i class="fas fa-tint me-1"></i>Humidity (%)
+                                    </label>
+                                    <input type="number" class="form-control" id="humidity" step="0.1" value="65.2" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="gasLevel" class="form-label">
+                                        <i class="fas fa-wind me-1"></i>Gas Level (ppm)
+                                    </label>
+                                    <input type="number" class="form-control" id="gasLevel" step="0.1" value="45.0" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="hiveWeight" class="form-label">
+                                        <i class="fas fa-weight me-1"></i>Hive Weight (kg)
+                                    </label>
+                                    <input type="number" class="form-control" id="hiveWeight" step="0.1" value="12.5" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="batteryLevel" class="form-label">
+                                        <i class="fas fa-battery-three-quarters me-1"></i>Battery Level (%)
+                                    </label>
+                                    <input type="number" class="form-control" id="batteryLevel" min="0" max="100" value="85" required>
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane me-2"></i>Send Test Data
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="generateRandomData()">
+                                    <i class="fas fa-dice me-2"></i>Generate Random Data
+                                </button>
+                                <button type="button" class="btn btn-outline-info" onclick="testAlertConditions()">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>Test Alerts
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div id="result" class="mt-4" style="display: none;">
+                    <div class="alert alert-dismissible fade show" role="alert">
+                        <span id="resultMessage"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-info-circle me-2"></i>Instructions
+                        </h5>
+                        <ol>
+                            <li><strong>Register a Sensor:</strong> First, go to the admin panel and register a sensor to get a sensor key</li>
+                            <li><strong>Enter Credentials:</strong> Use the sensor ID and key from the admin panel</li>
+                            <li><strong>Send Data:</strong> Click "Send Test Data" to send sensor readings to the system</li>
+                            <li><strong>Check Dashboard:</strong> Go to the main dashboard to see the data appear in real-time</li>
+                            <li><strong>Test Alerts:</strong> Use "Test Alerts" to send data that will trigger alert conditions</li>
+                        </ol>
+                        
+                        <div class="alert alert-info mt-3">
+                            <i class="fas fa-lightbulb me-2"></i>
+                            <strong>Tip:</strong> Use the "Generate Random Data" button to simulate realistic sensor readings, or "Test Alerts" to trigger warning/critical alerts.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-code me-2"></i>API Information
+                        </h5>
+                        <p>This form sends data to: <code>POST /api/sensor/data</code></p>
+                        <p>You can also send data programmatically using this JSON format:</p>
+                        <pre class="bg-light p-3 rounded"><code id="jsonExample">{
+  "sensor_id": "test_sensor_001",
+  "sensor_key": "your_sensor_key_here",
+  "hive_id": "test_hive_001",
+  "temperature": 25.5,
+  "humidity": 65.2,
+  "gas_level": 45.0,
+  "hive_weight": 12.5,
+  "battery_level": 85,
+  "signal_strength": 75
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('testSensorForm');
+        const result = document.getElementById('result');
+        const resultMessage = document.getElementById('resultMessage');
+        const jsonExample = document.getElementById('jsonExample');
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const payload = {
+                sensor_id: document.getElementById('sensorId').value,
+                sensor_key: document.getElementById('sensorKey').value,
+                hive_id: document.getElementById('hiveId').value,
+                temperature: parseFloat(document.getElementById('temperature').value),
+                humidity: parseFloat(document.getElementById('humidity').value),
+                gas_level: parseFloat(document.getElementById('gasLevel').value),
+                hive_weight: parseFloat(document.getElementById('hiveWeight').value),
+                battery_level: parseInt(document.getElementById('batteryLevel').value),
+                signal_strength: Math.floor(Math.random() * 30) + 70 // Random signal strength
+            };
+
+            try {
+                const response = await fetch('/api/sensor/data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.status === 'success') {
+                    resultMessage.textContent = '✅ Test data sent successfully! Check the dashboard to see the updated readings.';
+                    result.className = 'mt-4';
+                    result.innerHTML = '<div class="alert alert-success alert-dismissible fade show" role="alert"><span>' + resultMessage.textContent + '</span><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>';
+                } else {
+                    resultMessage.textContent = '❌ Error: ' + (data.message || 'Failed to send data');
+                    result.className = 'mt-4';
+                    result.innerHTML = '<div class="alert alert-danger alert-dismissible fade show" role="alert"><span>' + resultMessage.textContent + '</span><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>';
+                }
+            } catch (error) {
+                resultMessage.textContent = '❌ Network Error: ' + error.message;
+                result.className = 'mt-4';
+                result.innerHTML = '<div class="alert alert-danger alert-dismissible fade show" role="alert"><span>' + resultMessage.textContent + '</span><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>';
+            }
+
+            result.style.display = 'block';
+            updateJsonExample();
+        });
+
+        function updateJsonExample() {
+            const payload = {
+                sensor_id: document.getElementById('sensorId').value,
+                sensor_key: document.getElementById('sensorKey').value || 'your_sensor_key_here',
+                hive_id: document.getElementById('hiveId').value,
+                temperature: parseFloat(document.getElementById('temperature').value),
+                humidity: parseFloat(document.getElementById('humidity').value),
+                gas_level: parseFloat(document.getElementById('gasLevel').value),
+                hive_weight: parseFloat(document.getElementById('hiveWeight').value),
+                battery_level: parseInt(document.getElementById('batteryLevel').value),
+                signal_strength: 75
+            };
+            jsonExample.textContent = JSON.stringify(payload, null, 2);
+        }
+
+        // Update JSON example when form changes
+        form.addEventListener('input', updateJsonExample);
+    });
+
+    function generateRandomData() {
+        document.getElementById('temperature').value = (Math.random() * 20 + 15).toFixed(1);
+        document.getElementById('humidity').value = (Math.random() * 40 + 40).toFixed(1);
+        document.getElementById('gasLevel').value = (Math.random() * 60 + 20).toFixed(1);
+        document.getElementById('hiveWeight').value = (Math.random() * 8 + 8).toFixed(1);
+        document.getElementById('batteryLevel').value = Math.floor(Math.random() * 30 + 70);
+    }
+
+    function testAlertConditions() {
+        // Generate data that will trigger alerts
+        const alertType = Math.floor(Math.random() * 4);
+        
+        switch(alertType) {
+            case 0: // Low temperature alert
+                document.getElementById('temperature').value = '8.5';
+                document.getElementById('humidity').value = '65.2';
+                document.getElementById('gasLevel').value = '45.0';
+                break;
+            case 1: // High temperature alert
+                document.getElementById('temperature').value = '38.5';
+                document.getElementById('humidity').value = '65.2';
+                document.getElementById('gasLevel').value = '45.0';
+                break;
+            case 2: // High humidity alert
+                document.getElementById('temperature').value = '25.5';
+                document.getElementById('humidity').value = '85.5';
+                document.getElementById('gasLevel').value = '45.0';
+                break;
+            case 3: // High gas level alert
+                document.getElementById('temperature').value = '25.5';
+                document.getElementById('humidity').value = '65.2';
+                document.getElementById('gasLevel').value = '150.0';
+                break;
+        }
+        
+        document.getElementById('hiveWeight').value = '12.5';
+        document.getElementById('batteryLevel').value = '15'; // Low battery alert
+    }
+    </script>
+</body>
+</html>

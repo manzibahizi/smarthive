@@ -3,99 +3,324 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Beekeeping Tips</title>
+    <title>Admin - Beekeeping Tips - Smart Hive Solution</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css?v=2">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/">Smart Hive</a>
+            <a class="navbar-brand fw-bold" href="/">Smart Hive Solution</a>
+            <div class="ms-auto">
+                <a class="btn btn-outline-primary btn-sm me-2" href="/tips.html">
+                    <i class="fas fa-eye me-1"></i>User View
+                </a>
+                <a class="btn btn-outline-secondary btn-sm" href="/admin/users">
+                    <i class="fas fa-users me-1"></i>Manage Users
+                </a>
+            </div>
         </div>
     </nav>
 
-    <div class="container my-4">
-        <h2 class="mb-3">Manage Beekeeping Tips</h2>
-        <form id="tipForm" class="row g-3 mb-4">
-            <div class="col-md-4">
-                <label class="form-label" for="title">Title</label>
-                <input type="text" class="form-control" id="title" required placeholder="e.g., Keep bees hydrated">
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="mb-1">
+                    <i class="fas fa-lightbulb text-warning me-2"></i>Beekeeping Tips Management
+                </h2>
+                <p class="text-muted mb-0">Create and manage helpful beekeeping tips for users</p>
             </div>
-            <div class="col-md-6">
-                <label class="form-label" for="description">Description</label>
-                <input type="text" class="form-control" id="description" required placeholder="Short helpful message">
-            </div>
-            <div class="col-md-2">
-                <label class="form-label" for="icon">Icon (emoji)</label>
-                <input type="text" class="form-control" id="icon" placeholder="🐝">
-            </div>
-            <div class="col-12">
-                <button class="btn btn-success" type="submit">Add Tip</button>
-            </div>
-        </form>
+        </div>
 
-        <div>
-            <h4>Existing Tips</h4>
-            <ul id="tipsList" class="list-group"></ul>
+        <div id="status" class="alert alert-dismissible fade" role="alert" style="display: none;">
+            <span id="statusMessage"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="card dashboard-card mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-plus me-2"></i>Add New Tip
+                    </h5>
+                    <div class="text-muted small">
+                        <i class="fas fa-info-circle me-1"></i>Create helpful tips for beekeepers
+                    </div>
+                </div>
+                <form id="tipForm" class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label" for="title">
+                            <i class="fas fa-heading me-1"></i>Title *
+                        </label>
+                        <input type="text" class="form-control" id="title" required placeholder="e.g., Keep bees hydrated">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="description">
+                            <i class="fas fa-align-left me-1"></i>Description *
+                        </label>
+                        <input type="text" class="form-control" id="description" required placeholder="Short helpful message">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label" for="icon">
+                            <i class="fas fa-smile me-1"></i>Icon (emoji)
+                        </label>
+                        <input type="text" class="form-control" id="icon" placeholder="🐝">
+                    </div>
+                    <div class="col-12">
+                        <button class="btn btn-success" type="submit">
+                            <i class="fas fa-plus me-2"></i>Add Tip
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card dashboard-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-list me-2"></i>Existing Tips
+                    </h5>
+                    <div class="text-muted small">
+                        <i class="fas fa-sync-alt me-1"></i>Auto-refresh enabled
+                    </div>
+                </div>
+                <div id="tipsList" class="list-group">
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-spinner fa-spin fa-2x mb-2"></i>
+                        <p class="mb-0">Loading tips...</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-    async function fetchTips() {
-        const res = await fetch('/api/tips');
-        const data = await res.json();
-        const list = Array.isArray(data.tips) ? data.tips : [];
-        const ul = document.getElementById('tipsList');
-        ul.innerHTML = '';
-        list.forEach(t => {
-            const li = document.createElement('li');
-            li.className = 'list-group-item';
-            li.innerHTML = `
-              <div class="row g-2 align-items-center">
-                <div class="col-md-3"><input class="form-control form-control-sm title" value="${t.title || ''}"></div>
-                <div class="col-md-6"><input class="form-control form-control-sm desc" value="${t.description || ''}"></div>
-                <div class="col-md-1"><input class="form-control form-control-sm icon" value="${t.icon || ''}"></div>
-                <div class="col-md-2 text-end">
-                    <button class="btn btn-sm btn-primary save">Save</button>
-                    <button class="btn btn-sm btn-outline-danger ms-1 del">Delete</button>
-                </div>
-              </div>`;
-            ul.appendChild(li);
-            li.querySelector('.save').addEventListener('click', async ()=>{
-                const payload = {
-                    title: li.querySelector('.title').value.trim(),
-                    description: li.querySelector('.desc').value.trim(),
-                    icon: li.querySelector('.icon').value.trim()
-                };
-                const res2 = await fetch(`/api/admin/tips/${t.id}`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-                if(res2.ok){ fetchTips(); } else { alert('Failed to update'); }
-            });
-            li.querySelector('.del').addEventListener('click', async ()=>{
-                if(!confirm('Delete this tip?')) return;
-                const res3 = await fetch(`/api/admin/tips/${t.id}`, { method:'DELETE' });
-                if(res3.ok){ fetchTips(); } else { alert('Failed to delete'); }
-            });
-        });
-    }
+    document.addEventListener('DOMContentLoaded', function() {
+        const tipsList = document.getElementById('tipsList');
+        const status = document.getElementById('status');
+        const statusMessage = document.getElementById('statusMessage');
+        const tipForm = document.getElementById('tipForm');
 
-    document.getElementById('tipForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const payload = {
-            title: document.getElementById('title').value.trim(),
-            description: document.getElementById('description').value.trim(),
-            icon: document.getElementById('icon').value.trim()
-        };
-        const res = await fetch('/api/admin/tips', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-        if (res.ok) {
-            e.target.reset();
-            fetchTips();
-        } else {
-            const msg = await res.text();
-            alert('Failed to add tip: ' + msg);
+        function showStatus(msg, isSuccess) {
+            statusMessage.textContent = msg;
+            status.className = `alert alert-${isSuccess ? 'success' : 'danger'} alert-dismissible fade show`;
+            status.style.display = 'block';
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                status.style.display = 'none';
+            }, 5000);
         }
-    });
 
-    fetchTips();
+        async function fetchTips() {
+            tipsList.innerHTML = `
+                <div class="text-center text-muted py-4">
+                    <i class="fas fa-spinner fa-spin fa-2x mb-2"></i>
+                    <p class="mb-0">Loading tips...</p>
+                </div>
+            `;
+            
+            try {
+                const res = await fetch('/api/admin/tips');
+                const data = await res.json();
+                const list = Array.isArray(data.tips) ? data.tips : [];
+                
+                if (list.length === 0) {
+                    tipsList.innerHTML = `
+                        <div class="text-center text-muted py-5">
+                            <i class="fas fa-lightbulb fa-3x mb-3 text-muted"></i>
+                            <h5 class="text-muted">No Tips Yet</h5>
+                            <p class="mb-0">Create your first beekeeping tip to help users.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                tipsList.innerHTML = '';
+                list.forEach(t => {
+                    const li = document.createElement('div');
+                    li.className = 'list-group-item';
+                    li.innerHTML = `
+                        <div class="row g-2 align-items-center">
+                            <div class="col-md-1 text-center">
+                                <span class="fs-4">${t.icon || '💡'}</span>
+                            </div>
+                            <div class="col-md-3">
+                                <input class="form-control form-control-sm title" value="${t.title || ''}" placeholder="Tip title">
+                            </div>
+                            <div class="col-md-6">
+                                <input class="form-control form-control-sm desc" value="${t.description || ''}" placeholder="Tip description">
+                            </div>
+                            <div class="col-md-1">
+                                <input class="form-control form-control-sm icon" value="${t.icon || ''}" placeholder="🐝">
+                            </div>
+                            <div class="col-md-1 text-end">
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-sm btn-primary save" title="Save Changes">
+                                        <i class="fas fa-save"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger del" title="Delete Tip">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    tipsList.appendChild(li);
+                    
+                    li.querySelector('.save').addEventListener('click', async () => {
+                        const payload = {
+                            title: li.querySelector('.title').value.trim(),
+                            description: li.querySelector('.desc').value.trim(),
+                            icon: li.querySelector('.icon').value.trim()
+                        };
+                        
+                        if (!payload.title || !payload.description) {
+                            showStatus('Please fill in title and description', false);
+                            return;
+                        }
+                        
+                        try {
+                            const res2 = await fetch(`/api/admin/tips/${t.id}`, { 
+                                method: 'PUT', 
+                                headers: { 'Content-Type': 'application/json' }, 
+                                body: JSON.stringify(payload) 
+                            });
+                            const result = await res2.json();
+                            
+                            if (res2.ok && result.status === 'success') {
+                                fetchTips();
+                                showStatus('Tip updated successfully!', true);
+                            } else {
+                                showStatus(result.message || 'Failed to update tip', false);
+                            }
+                        } catch (error) {
+                            showStatus('Failed to update tip', false);
+                        }
+                    });
+                    
+                    li.querySelector('.del').addEventListener('click', () => {
+                        // Enhanced delete confirmation with better UI
+                        const deleteModal = document.createElement('div');
+                        deleteModal.className = 'modal fade';
+                        deleteModal.innerHTML = `
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header bg-danger text-white">
+                                        <h5 class="modal-title">
+                                            <i class="fas fa-exclamation-triangle me-2"></i>Delete Tip
+                                        </h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body text-center">
+                                        <div class="mb-3">
+                                            <i class="fas fa-lightbulb fa-4x text-warning"></i>
+                                        </div>
+                                        <h5 class="text-danger mb-3">Are you sure?</h5>
+                                        <p class="text-muted mb-3">
+                                            You are about to delete "<strong>${t.title}</strong>". 
+                                            This action cannot be undone and the tip will be permanently removed.
+                                        </p>
+                                        <div class="alert alert-warning">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            <strong>Warning:</strong> This action is irreversible!
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer justify-content-center">
+                                        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">
+                                            <i class="fas fa-times me-2"></i>Cancel
+                                        </button>
+                                        <button type="button" class="btn btn-danger" id="confirmDeleteTipBtn">
+                                            <i class="fas fa-trash-alt me-2"></i>Delete Permanently
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        
+                        document.body.appendChild(deleteModal);
+                        const modal = new bootstrap.Modal(deleteModal);
+                        modal.show();
+                        
+                        // Handle delete confirmation
+                        document.getElementById('confirmDeleteTipBtn').addEventListener('click', async () => {
+                            const btn = document.getElementById('confirmDeleteTipBtn');
+                            btn.disabled = true;
+                            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Deleting...';
+                            
+                            try {
+                                const res3 = await fetch(`/api/admin/tips/${t.id}`, { method: 'DELETE' });
+                                const result = await res3.json();
+                                
+                                if (res3.ok && result.status === 'success') {
+                                    modal.hide();
+                                    fetchTips();
+                                    showStatus('Tip deleted successfully!', true);
+                                } else {
+                                    throw new Error(result.message || 'Failed to delete tip');
+                                }
+                            } catch (error) {
+                                showStatus('Failed to delete tip: ' + error.message, false);
+                                btn.disabled = false;
+                                btn.innerHTML = '<i class="fas fa-trash-alt me-2"></i>Delete Permanently';
+                            }
+                            
+                            // Clean up modal after hiding
+                            deleteModal.addEventListener('hidden.bs.modal', () => {
+                                document.body.removeChild(deleteModal);
+                            });
+                        });
+                    });
+                });
+            } catch (error) {
+                tipsList.innerHTML = `
+                    <div class="text-center text-danger py-4">
+                        <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                        <p class="mb-0">Failed to load tips</p>
+                    </div>
+                `;
+                showStatus('Failed to load tips', false);
+            }
+        }
+
+        tipForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const payload = {
+                title: document.getElementById('title').value.trim(),
+                description: document.getElementById('description').value.trim(),
+                icon: document.getElementById('icon').value.trim()
+            };
+            
+            if (!payload.title || !payload.description) {
+                showStatus('Please fill in title and description', false);
+                return;
+            }
+            
+            try {
+                const res = await fetch('/api/admin/tips', { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(payload) 
+                });
+                const result = await res.json();
+                
+                if (res.ok && result.status === 'success') {
+                    e.target.reset();
+                    fetchTips();
+                    showStatus('Tip added successfully!', true);
+                } else {
+                    showStatus(result.message || 'Failed to add tip', false);
+                }
+            } catch (error) {
+                showStatus('Failed to add tip', false);
+            }
+        });
+
+        fetchTips();
+    });
     </script>
     <script src="/js/main.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

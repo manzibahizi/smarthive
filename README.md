@@ -51,4 +51,4 @@ The application uses JSON files for data storage by default. For MySQL setup:
 
 ## 📄 License
 
-Copyright © 2024 Hive Nova Technologies
+Copyright © 2024 Smart Hive Solution

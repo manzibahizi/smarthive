@@ -1,10 +1,12 @@
 [
     {
         "id": 1,
-        "title": "Basic Beekeeping",
+        "title": "Basic Beekeeping mnsx",
         "description": "Intro to equipment, hive setup, and safety.",
         "published": true,
-        "date": "2025-09-30"
+        "date": "2025-09-30",
+        "active": true,
+        "updated_at": "2025-10-16T05:48:10+02:00"
     },
     {
         "id": 2,
@@ -33,5 +35,13 @@
         "description": "Inspections, pest control, seasonal tasks.",
         "date": "2025-10-07",
         "published": true
+    },
+    {
+        "id": 6,
+        "title": "majdsfdg bn",
+        "description": "sfgdhfhetrwsd",
+        "date": "2025-10-21",
+        "published": false,
+        "created_at": "2025-10-16T04:41:46+02:00"
     }
 ]

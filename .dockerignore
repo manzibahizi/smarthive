@@ -1,0 +1,82 @@
+# Smart Hive Solution - Docker Ignore File
+# This file tells Docker what to exclude from the build context
+
+# Git files
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+*.md
+docs/
+
+# Development files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+storage/logs/
+
+# Cache
+cache/
+tmp/
+temp/
+
+# Node modules (if any)
+node_modules/
+npm-debug.log*
+
+# Composer dev dependencies
+vendor/bin/
+vendor/composer/
+vendor/doctrine/
+vendor/myclabs/
+vendor/nikic/
+vendor/phar-io/
+vendor/phpunit/
+vendor/sebastian/
+vendor/theseer/
+
+# Test files
+tests/
+phpunit.xml
+.phpunit.result.cache
+
+# Backup files
+*.bak
+*.backup
+storage/backup_*
+
+# Docker files (don't include docker config in image)
+docker/
+docker-compose.yml
+docker-compose.override.yml
+docker-setup.sh
+docker-setup.bat
+docker-commands.txt
+
+# Deployment files
+deploy.sh
+render.yaml
+Procfile
+
+# Development scripts
+test_registration.php

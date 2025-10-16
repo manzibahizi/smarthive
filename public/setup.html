@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Hive Solution - Quick Setup Guide</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/style.css?v=2" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="/">Smart Hive Solution</a>
+            <div class="ms-auto">
+                <a class="btn btn-outline-primary btn-sm me-2" href="/">
+                    <i class="fas fa-home me-1"></i>Dashboard
+                </a>
+                <a class="btn btn-outline-secondary btn-sm" href="/login.html">
+                    <i class="fas fa-sign-in-alt me-1"></i>Login
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="text-center mb-5">
+                    <h1 class="display-4 mb-3">
+                        <i class="fas fa-rocket text-primary me-3"></i>Quick Setup Guide
+                    </h1>
+                    <p class="lead text-muted">Get your Smart Hive Solution up and running in minutes!</p>
+                </div>
+
+                <div class="row g-4">
+                    <!-- Step 1: Login -->
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center p-4">
+                                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                    <i class="fas fa-sign-in-alt fa-lg"></i>
+                                </div>
+                                <h5 class="card-title">1. Login as Admin</h5>
+                                <p class="card-text text-muted">Access the admin panel to manage your system</p>
+                                <div class="mt-3">
+                                    <strong>Default Credentials:</strong><br>
+                                    <code>Username: Admin</code><br>
+                                    <code>Password: Admin123</code>
+                                </div>
+                                <a href="/login.html" class="btn btn-primary mt-3">
+                                    <i class="fas fa-sign-in-alt me-2"></i>Login Now
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Register Sensors -->
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center p-4">
+                                <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                    <i class="fas fa-microchip fa-lg"></i>
+                                </div>
+                                <h5 class="card-title">2. Register Sensors</h5>
+                                <p class="card-text text-muted">Add your IoT sensors to start monitoring</p>
+                                <div class="mt-3">
+                                    <small class="text-muted">After login, go to:</small><br>
+                                    <code>Sensor Management</code>
+                                </div>
+                                <a href="/admin-sensors.html" class="btn btn-success mt-3">
+                                    <i class="fas fa-microchip me-2"></i>Manage Sensors
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Monitor Data -->
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center p-4">
+                                <div class="bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                    <i class="fas fa-chart-line fa-lg"></i>
+                                </div>
+                                <h5 class="card-title">3. Monitor Data</h5>
+                                <p class="card-text text-muted">View real-time hive monitoring data</p>
+                                <div class="mt-3">
+                                    <small class="text-muted">Dashboard shows:</small><br>
+                                    <code>Temperature, Humidity, Gas, Weight</code>
+                                </div>
+                                <a href="/" class="btn btn-info mt-3">
+                                    <i class="fas fa-chart-line me-2"></i>View Dashboard
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- API Information -->
+                <div class="card mt-5 border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h4 class="card-title mb-4">
+                            <i class="fas fa-code me-2"></i>Sensor API Information
+                        </h4>
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-server me-2"></i>API Endpoint</h6>
+                                <div class="bg-light p-3 rounded">
+                                    <code>POST http://localhost:8000/api/sensor/data</code>
+                                </div>
+                                
+                                <h6 class="mt-4"><i class="fas fa-key me-2"></i>Required Fields</h6>
+                                <ul class="list-unstyled">
+                                    <li><code>sensor_id</code> - Your sensor ID</li>
+                                    <li><code>sensor_key</code> - Authentication key</li>
+                                    <li><code>hive_id</code> - Hive identifier</li>
+                                    <li><code>temperature</code> - Temperature in °C</li>
+                                    <li><code>humidity</code> - Humidity percentage</li>
+                                    <li><code>gas_level</code> - Gas level in ppm</li>
+                                    <li><code>hive_weight</code> - Weight in kg</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-file-code me-2"></i>Example JSON</h6>
+                                <pre class="bg-light p-3 rounded"><code>{
+  "sensor_id": "sensor_001",
+  "sensor_key": "your_key_here",
+  "hive_id": "hive_001",
+  "temperature": 25.5,
+  "humidity": 65.2,
+  "gas_level": 45.0,
+  "hive_weight": 12.5,
+  "battery_level": 85,
+  "signal_strength": 75
+}</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card mt-4 border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h4 class="card-title mb-4">
+                            <i class="fas fa-bolt me-2"></i>Quick Actions
+                        </h4>
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <a href="/test-sensor.html" class="btn btn-outline-primary w-100">
+                                    <i class="fas fa-flask me-2"></i>Test Sensor Data
+                                </a>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="/sensor-generator.html" class="btn btn-outline-info w-100">
+                                    <i class="fas fa-microchip me-2"></i>Sensor Generator
+                                </a>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="/hive-monitoring.html" class="btn btn-outline-success w-100">
+                                    <i class="fas fa-heartbeat me-2"></i>Live Monitoring
+                                </a>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="/admin-training.html" class="btn btn-outline-warning w-100">
+                                    <i class="fas fa-graduation-cap me-2"></i>Training Programs
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Status -->
+                <div class="card mt-4 border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h4 class="card-title mb-4">
+                            <i class="fas fa-heartbeat me-2"></i>System Status
+                        </h4>
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 50px; height: 50px;">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    <h6>API Server</h6>
+                                    <span class="badge bg-success">Online</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 50px; height: 50px;">
+                                        <i class="fas fa-database"></i>
+                                    </div>
+                                    <h6>Database</h6>
+                                    <span class="badge bg-success">Connected</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div class="bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 50px; height: 50px;">
+                                        <i class="fas fa-microchip"></i>
+                                    </div>
+                                    <h6>Sensors</h6>
+                                    <span class="badge bg-info" id="sensorCount">0 Active</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div class="bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 50px; height: 50px;">
+                                        <i class="fas fa-bell"></i>
+                                    </div>
+                                    <h6>Alerts</h6>
+                                    <span class="badge bg-warning" id="alertCount">0 Active</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Help Section -->
+                <div class="card mt-4 border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h4 class="card-title mb-4">
+                            <i class="fas fa-question-circle me-2"></i>Need Help?
+                        </h4>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-book me-2"></i>Documentation</h6>
+                                <p class="text-muted">Check the sensor integration guide for detailed API documentation and code examples.</p>
+                                <a href="#" class="btn btn-outline-primary btn-sm">View Documentation</a>
+                            </div>
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-code me-2"></i>Code Examples</h6>
+                                <p class="text-muted">Ready-to-use code examples for Arduino, Raspberry Pi, and Node.js.</p>
+                                <a href="#" class="btn btn-outline-primary btn-sm">View Examples</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    // Load system status
+    document.addEventListener('DOMContentLoaded', function() {
+        loadSystemStatus();
+    });
+
+    async function loadSystemStatus() {
+        try {
+            // Load sensor count
+            const sensorResponse = await fetch('/api/admin/sensors');
+            if (sensorResponse.ok) {
+                const sensorData = await sensorResponse.json();
+                const activeSensors = sensorData.sensors ? sensorData.sensors.filter(s => s.is_active).length : 0;
+                document.getElementById('sensorCount').textContent = `${activeSensors} Active`;
+            }
+
+            // Load alert count
+            const alertResponse = await fetch('/api/alerts');
+            if (alertResponse.ok) {
+                const alertData = await alertResponse.json();
+                const activeAlerts = alertData.alerts ? alertData.alerts.filter(a => !a.is_resolved).length : 0;
+                document.getElementById('alertCount').textContent = `${activeAlerts} Active`;
+            }
+        } catch (error) {
+            console.log('Could not load system status (login required)');
+        }
+    }
+    </script>
+</body>
+</html>

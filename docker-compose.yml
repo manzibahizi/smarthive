@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  # PHP Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.php
+    container_name: smart_hive_app
+    ports:
+      - "8080:80"
+    volumes:
+      - ./public:/var/www/html/public
+      - ./storage:/var/www/html/storage
+      - ./app:/var/www/html/app
+      - ./config:/var/www/html/config
+    environment:
+      - APP_ENV=development
+      - DB_HOST=db
+      - DB_NAME=smart_hive
+      - DB_USER=root
+      - DB_PASS=password
+    depends_on:
+      - db
+    networks:
+      - smart_hive_network
+
+  # MySQL Database
+  db:
+    image: mysql:8.0
+    container_name: smart_hive_db
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=smart_hive
+      - MYSQL_USER=hive_user
+      - MYSQL_PASSWORD=hive_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql-init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - smart_hive_network
+
+  # phpMyAdmin (optional)
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: smart_hive_phpmyadmin
+    ports:
+      - "8081:80"
+    environment:
+      - PMA_HOST=db
+      - PMA_USER=root
+      - PMA_PASSWORD=password
+    depends_on:
+      - db
+    networks:
+      - smart_hive_network
+
+volumes:
+  mysql_data:
+
+networks:
+  smart_hive_network:
+    driver: bridge

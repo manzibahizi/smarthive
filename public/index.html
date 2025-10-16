@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hive Nova Technologies</title>
+    <title>Smart Hive Solution</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="css/style.css?v=2" rel="stylesheet">
@@ -40,6 +40,11 @@
                         <i class="fas fa-bug"></i> <span class="nav-text">Hives</span>
                     </a>
                 </li>
+                        <li>
+                            <a href="/notification-settings.html" class="nav-link" aria-expanded="false">
+                                <i class="fas fa-bell"></i> <span class="nav-text">Notifications</span>
+                            </a>
+                        </li>
                 <li>
                     <a href="/weather" class="nav-link" aria-expanded="false">
                         <i class="fas fa-cloud-sun"></i> <span class="nav-text">Weather</span>
@@ -87,15 +92,90 @@
                         <i class="fas fa-bars"></i>
                     </button>
                     <div class="ms-auto">
+                        <a class="btn btn-outline-light btn-sm me-2" href="/setup.html">
+                            <i class="fas fa-rocket me-1"></i>Quick Setup
+                        </a>
                         <span class="navbar-text">
-                            Welcome to Hive Nova Technologies
+                            Welcome to Smart Hive Solution
                         </span>
                     </div>
                 </div>
             </nav>
 
             <div class="container-fluid">
-                <!-- Dashboard Content -->
+                <!-- Daily Hive Management Actions -->
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-warning text-dark">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-tools me-2"></i>Daily Hive Management Actions
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-3">
+                                        <button class="btn btn-outline-primary w-100 h-100" onclick="scheduleInspection()">
+                                            <i class="fas fa-clipboard-check fa-2x mb-2"></i>
+                                            <h6>Schedule Inspection</h6>
+                                            <small>Plan hive inspections</small>
+                                        </button>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <button class="btn btn-outline-success w-100 h-100" onclick="recordHarvest()">
+                                            <i class="fas fa-jar fa-2x mb-2"></i>
+                                            <h6>Record Harvest</h6>
+                                            <small>Log honey production</small>
+                                        </button>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <button class="btn btn-outline-info w-100 h-100" onclick="checkWeather()">
+                                            <i class="fas fa-cloud-sun fa-2x mb-2"></i>
+                                            <h6>Weather Check</h6>
+                                            <small>Check conditions</small>
+                                        </button>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <button class="btn btn-outline-warning w-100 h-100" onclick="manageFeeding()">
+                                            <i class="fas fa-seedling fa-2x mb-2"></i>
+                                            <h6>Feeding Schedule</h6>
+                                            <small>Manage bee feeding</small>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Quick Actions -->
+                <div id="adminQuickActions" class="row mt-3" style="display: none;">
+                    <div class="col-12">
+                        <div class="card bg-light">
+                            <div class="card-body py-2">
+                                <div class="d-flex align-items-center">
+                                    <h6 class="mb-0 me-3">
+                                        <i class="fas fa-tools me-2"></i>Admin Quick Actions:
+                                    </h6>
+                                    <div class="d-flex gap-2">
+                                        <a href="/admin-training.html" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-graduation-cap me-1"></i>Add Training
+                                        </a>
+                                        <a href="/admin-tips.html" class="btn btn-success btn-sm">
+                                            <i class="fas fa-lightbulb me-1"></i>Add Tips
+                                        </a>
+                                        <a href="/admin-sensors.html" class="btn btn-info btn-sm">
+                                            <i class="fas fa-microchip me-1"></i>Manage Sensors
+                                        </a>
+                                        <a href="/admin/users" class="btn btn-secondary btn-sm">
+                                            <i class="fas fa-users me-1"></i>Manage Users
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div id="dashboard" class="row mt-4">
                     <div class="col-md-3">
                         <div class="card dashboard-card">
@@ -151,39 +231,105 @@
                                 <small class="text-muted">Safe range: &lt; 200 ppm</small>
                             </div>
                         </div>
+                </div>
+            </div>
+
+            <!-- Performance Metrics and Tasks -->
+            <div class="row mt-4">
+                <div class="col-lg-6">
+                    <div class="card dashboard-card">
+                        <div class="card-body">
+                            <h6 class="card-title text-info">
+                                <i class="fas fa-chart-pie me-2"></i>Hive Performance Metrics
+                            </h6>
+                            <div class="text-center">
+                                <canvas id="performanceChart" height="200"></canvas>
+                                <div class="mt-3">
+                                    <div class="d-flex justify-content-center gap-3">
+                                        <span class="badge bg-success">Healthy</span>
+                                        <span class="badge bg-warning">Warning</span>
+                                        <span class="badge bg-danger">Critical</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+                <div class="col-lg-6">
+                    <div class="card dashboard-card">
+                        <div class="card-body">
+                            <h6 class="card-title text-dark">
+                                <i class="fas fa-calendar-alt me-2"></i>Upcoming Tasks
+                            </h6>
+                            <div id="upcomingTasks">
+                                <div class="text-center text-muted py-3">
+                                    <i class="fas fa-calendar-check fa-2x mb-2"></i>
+                                    <p class="mb-0">No upcoming tasks</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                <!-- Charts Section -->
+            <!-- Charts Section -->
                 <div id="analytics" class="row mt-4">
                     <div class="col-md-6">
-                        <div class="card">
+                        <div class="card dashboard-card">
                             <div class="card-body">
-                                <h5 class="card-title">Temperature Trend</h5>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-thermometer-half text-danger me-2"></i>Temperature Trend
+                                    </h5>
+                                    <div class="text-muted small">
+                                        <i class="fas fa-clock me-1"></i>Last 6 hours
+                                    </div>
+                                </div>
                                 <canvas id="temperatureChart"></canvas>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="card">
+                        <div class="card dashboard-card">
                             <div class="card-body">
-                                <h5 class="card-title">Hive Activity</h5>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-chart-bar text-primary me-2"></i>Hive Activity
+                                    </h5>
+                                    <div class="text-muted small">
+                                        <i class="fas fa-bug me-1"></i>Activity Level
+                                    </div>
+                                </div>
                                 <canvas id="activityChart"></canvas>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-6 mt-4">
-                        <div class="card">
+                        <div class="card dashboard-card">
                             <div class="card-body">
-                                <h5 class="card-title">Gas Level (ppm)</h5>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-wind text-warning me-2"></i>Gas Level (ppm)
+                                    </h5>
+                                    <div class="text-muted small">
+                                        <i class="fas fa-shield-alt me-1"></i>Safety Monitor
+                                    </div>
+                                </div>
                                 <canvas id="gasChart"></canvas>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-6 mt-4">
-                        <div class="card">
+                        <div class="card dashboard-card">
                             <div class="card-body">
-                                <h5 class="card-title">Humidity (%)</h5>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-tint text-info me-2"></i>Humidity (%)
+                                    </h5>
+                                    <div class="text-muted small">
+                                        <i class="fas fa-eye me-1"></i>Optimal: 50-60%
+                                    </div>
+                                </div>
                                 <canvas id="humidityChart"></canvas>
                             </div>
                         </div>
@@ -193,45 +339,52 @@
                 <!-- Hive Status Table -->
                 <div id="hives" class="row mt-4">
                     <div class="col-12">
-                        <div class="card">
+                        <div class="card dashboard-card">
                             <div class="card-body">
-                                <h5 class="card-title">Hive Status</h5>
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-bug text-success me-2"></i>Hive Status Overview
+                                    </h5>
+                                    <div class="text-muted small">
+                                        <i class="fas fa-sync-alt me-1"></i>Auto-refresh every minute
+                                    </div>
+                                </div>
                                 <div class="table-responsive">
                                     <table class="table table-hover">
                                         <thead>
                                             <tr>
-                                                <th>Hive ID</th>
-                                                <th>Status</th>
-                                                <th>Temperature</th>
-                                                <th>Humidity</th>
-                                                <th>Weight</th>
-                                                <th>Last Updated</th>
+                                                <th><i class="fas fa-hashtag me-1"></i>Hive ID</th>
+                                                <th><i class="fas fa-circle me-1"></i>Status</th>
+                                                <th><i class="fas fa-thermometer-half me-1"></i>Temperature</th>
+                                                <th><i class="fas fa-tint me-1"></i>Humidity</th>
+                                                <th><i class="fas fa-weight me-1"></i>Weight</th>
+                                                <th><i class="fas fa-clock me-1"></i>Last Updated</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr>
-                                                <td>Hive-001</td>
+                                                <td><strong>Hive-001</strong></td>
                                                 <td><span class="badge bg-success">Active</span></td>
-                                                <td>24°C</td>
-                                                <td>65%</td>
-                                                <td>45kg</td>
-                                                <td>2 mins ago</td>
+                                                <td><span class="text-success">24°C</span></td>
+                                                <td><span class="text-info">65%</span></td>
+                                                <td><span class="text-warning">45kg</span></td>
+                                                <td><small class="text-muted">2 mins ago</small></td>
                                             </tr>
                                             <tr>
-                                                <td>Hive-002</td>
+                                                <td><strong>Hive-002</strong></td>
                                                 <td><span class="badge bg-success">Active</span></td>
-                                                <td>23°C</td>
-                                                <td>68%</td>
-                                                <td>42kg</td>
-                                                <td>2 mins ago</td>
+                                                <td><span class="text-success">23°C</span></td>
+                                                <td><span class="text-info">68%</span></td>
+                                                <td><span class="text-warning">42kg</span></td>
+                                                <td><small class="text-muted">2 mins ago</small></td>
                                             </tr>
                                             <tr>
-                                                <td>Hive-003</td>
+                                                <td><strong>Hive-003</strong></td>
                                                 <td><span class="badge bg-warning">Warning</span></td>
-                                                <td>28°C</td>
-                                                <td>72%</td>
-                                                <td>38kg</td>
-                                                <td>2 mins ago</td>
+                                                <td><span class="text-danger">28°C</span></td>
+                                                <td><span class="text-danger">72%</span></td>
+                                                <td><span class="text-warning">38kg</span></td>
+                                                <td><small class="text-muted">2 mins ago</small></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -244,16 +397,179 @@
                 <!-- Weather -->
                 <div id="weather" class="row mt-4">
                     <div class="col-12">
-                        <div class="card">
+                        <div class="card dashboard-card">
                             <div class="card-body">
-                                <h5 class="card-title">Weather</h5>
-                                <div id="weatherSummary">Loading...</div>
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-cloud-sun text-primary me-2"></i>Weather Conditions
+                                    </h5>
+                                    <div class="text-muted small">
+                                        <i class="fas fa-map-marker-alt me-1"></i>Current Location
+                                    </div>
+                                </div>
+                                <div id="weatherSummary" class="alert alert-info">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-spinner fa-spin me-2"></i>
+                                        <span>Loading weather data...</span>
+                                    </div>
+                                </div>
                                 <hr>
-                                <h6 class="mb-2">Recent Alerts</h6>
-                                <div id="alertsList"></div>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-bell text-warning me-2"></i>Recent Alerts
+                                    </h6>
+                                    <small class="text-muted">System notifications</small>
+                                </div>
+                                <div id="alertsList">
+                                    <div class="text-center text-muted py-3">
+                                        <i class="fas fa-check-circle fa-2x mb-2"></i>
+                                        <p class="mb-0">No recent alerts</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+            
+            <!-- Professional Footer -->
+            <footer class="mt-5 py-4 bg-light border-top">
+                <div class="container-fluid">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-bug text-warning me-2"></i>
+                                <span class="text-muted">© 2024 Smart Hive Solution. Professional Beehive Management System.</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <div class="text-muted small">
+                                <i class="fas fa-shield-alt me-1"></i>Secure & Reliable | 
+                                <i class="fas fa-clock me-1"></i>Real-time Monitoring | 
+                                <i class="fas fa-mobile-alt me-1"></i>Mobile Ready
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Inspection Modal -->
+    <div class="modal fade" id="inspectionModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-clipboard-check me-2"></i>Schedule Hive Inspection
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" title="Close modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="inspectionForm">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Hive ID</label>
+                                <select class="form-select" id="inspectionHiveId" required title="Select hive for inspection">
+                                    <option value="">Select Hive</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Inspection Type</label>
+                                <select class="form-select" id="inspectionType" required title="Select inspection type">
+                                    <option value="routine">Routine Check</option>
+                                    <option value="health">Health Assessment</option>
+                                    <option value="harvest">Pre-Harvest Check</option>
+                                    <option value="winter">Winter Preparation</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Scheduled Date</label>
+                                <input type="datetime-local" class="form-control" id="inspectionDate" required title="Select inspection date and time">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Priority</label>
+                                <select class="form-select" id="inspectionPriority" title="Select priority level">
+                                    <option value="low">Low</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="high">High</option>
+                                    <option value="urgent">Urgent</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Notes</label>
+                                <textarea class="form-control" id="inspectionNotes" rows="3" placeholder="Any specific observations or concerns..."></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveInspection()">
+                        <i class="fas fa-save me-2"></i>Schedule Inspection
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Harvest Modal -->
+    <div class="modal fade" id="harvestModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-jar me-2"></i>Record Honey Harvest
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" title="Close modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="harvestForm">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Hive ID</label>
+                                <select class="form-select" id="harvestHiveId" required title="Select hive for harvest">
+                                    <option value="">Select Hive</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Harvest Date</label>
+                                <input type="datetime-local" class="form-control" id="harvestDate" required title="Select harvest date and time">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Honey Weight (kg)</label>
+                                <input type="number" step="0.1" class="form-control" id="honeyWeight" required title="Enter honey weight in kilograms">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Honey Type</label>
+                                <select class="form-select" id="honeyType" title="Select honey type">
+                                    <option value="wildflower">Wildflower</option>
+                                    <option value="clover">Clover</option>
+                                    <option value="lavender">Lavender</option>
+                                    <option value="orange">Orange Blossom</option>
+                                    <option value="mixed">Mixed</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Quality Grade</label>
+                                <select class="form-select" id="honeyGrade" title="Select honey quality grade">
+                                    <option value="premium">Premium</option>
+                                    <option value="standard">Standard</option>
+                                    <option value="commercial">Commercial</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Notes</label>
+                                <textarea class="form-control" id="harvestNotes" rows="3" placeholder="Harvest observations, weather conditions, etc..."></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" onclick="saveHarvest()">
+                        <i class="fas fa-save me-2"></i>Record Harvest
+                    </button>
                 </div>
             </div>
         </div>
@@ -264,6 +580,214 @@
     <script src="js/mock-api.js"></script>
     <script src="js/main.js"></script>
     <script>
+    // Performance Chart
+    let performanceChart;
+
+    // Initialize performance chart
+    function initPerformanceChart() {
+        const ctx = document.getElementById('performanceChart').getContext('2d');
+        performanceChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Healthy', 'Warning', 'Critical'],
+                datasets: [{
+                    data: [0, 0, 0],
+                    backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+
+    // Load upcoming tasks
+    async function loadUpcomingTasks() {
+        try {
+            const response = await fetch('/api/tasks/upcoming');
+            if (response.ok) {
+                const data = await response.json();
+                updateUpcomingTasks(data.tasks || []);
+            }
+        } catch (error) {
+            console.error('Failed to load tasks:', error);
+        }
+    }
+
+    function updateUpcomingTasks(tasks) {
+        const container = document.getElementById('upcomingTasks');
+        container.innerHTML = '';
+
+        if (tasks.length === 0) {
+            container.innerHTML = `
+                <div class="text-center text-muted py-3">
+                    <i class="fas fa-calendar-check fa-2x mb-2"></i>
+                    <p class="mb-0">No upcoming tasks</p>
+                </div>
+            `;
+        } else {
+            tasks.forEach(task => {
+                const taskElement = document.createElement('div');
+                taskElement.className = 'border-bottom pb-2 mb-2';
+                taskElement.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>${task.title}</strong><br>
+                            <small class="text-muted">${task.description}</small>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-${getPriorityColor(task.priority)}">${task.priority}</span><br>
+                            <small class="text-muted">${new Date(task.scheduled_date).toLocaleDateString()}</small>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(taskElement);
+            });
+        }
+    }
+
+    function getPriorityColor(priority) {
+        switch (priority) {
+            case 'urgent': return 'danger';
+            case 'high': return 'warning';
+            case 'medium': return 'primary';
+            case 'low': return 'secondary';
+            default: return 'secondary';
+        }
+    }
+
+    // Load hive performance metrics
+    async function loadHivePerformance() {
+        try {
+            const response = await fetch('/api/hive/status');
+            if (response.ok) {
+                const data = await response.json();
+                updatePerformanceChart(data.hives || []);
+            }
+        } catch (error) {
+            console.error('Failed to load hive performance:', error);
+        }
+    }
+
+    function updatePerformanceChart(hives) {
+        if (performanceChart && hives.length > 0) {
+            const healthy = hives.filter(h => h.health_status === 'healthy').length;
+            const warning = hives.filter(h => h.health_status === 'warning').length;
+            const critical = hives.filter(h => h.health_status === 'critical').length;
+            
+            performanceChart.data.datasets[0].data = [healthy, warning, critical];
+            performanceChart.update();
+        }
+    }
+
+    // Modal functions
+    function scheduleInspection() {
+        loadHiveOptions('inspectionHiveId');
+        document.getElementById('inspectionDate').value = new Date().toISOString().slice(0, 16);
+        new bootstrap.Modal(document.getElementById('inspectionModal')).show();
+    }
+
+    function recordHarvest() {
+        loadHiveOptions('harvestHiveId');
+        document.getElementById('harvestDate').value = new Date().toISOString().slice(0, 16);
+        new bootstrap.Modal(document.getElementById('harvestModal')).show();
+    }
+
+    function checkWeather() {
+        window.location.href = '/weather.html';
+    }
+
+    function manageFeeding() {
+        alert('Feeding management feature coming soon!');
+    }
+
+    async function loadHiveOptions(selectId) {
+        try {
+            const response = await fetch('/api/hive/list');
+            if (response.ok) {
+                const data = await response.json();
+                const select = document.getElementById(selectId);
+                select.innerHTML = '<option value="">Select Hive</option>';
+                
+                if (data.hives) {
+                    data.hives.forEach(hive => {
+                        const option = document.createElement('option');
+                        option.value = hive.hive_id;
+                        option.textContent = `Hive ${hive.hive_id}`;
+                        select.appendChild(option);
+                    });
+                }
+            }
+        } catch (error) {
+            console.error('Failed to load hives:', error);
+        }
+    }
+
+    async function saveInspection() {
+        const inspectionData = {
+            hive_id: document.getElementById('inspectionHiveId').value,
+            type: document.getElementById('inspectionType').value,
+            scheduled_date: document.getElementById('inspectionDate').value,
+            priority: document.getElementById('inspectionPriority').value,
+            notes: document.getElementById('inspectionNotes').value
+        };
+
+        try {
+            const response = await fetch('/api/inspections', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(inspectionData)
+            });
+
+            if (response.ok) {
+                alert('Inspection scheduled successfully!');
+                bootstrap.Modal.getInstance(document.getElementById('inspectionModal')).hide();
+                document.getElementById('inspectionForm').reset();
+                loadUpcomingTasks();
+            } else {
+                alert('Failed to schedule inspection');
+            }
+        } catch (error) {
+            alert('Error scheduling inspection');
+        }
+    }
+
+    async function saveHarvest() {
+        const harvestData = {
+            hive_id: document.getElementById('harvestHiveId').value,
+            harvest_date: document.getElementById('harvestDate').value,
+            honey_weight: parseFloat(document.getElementById('honeyWeight').value),
+            honey_type: document.getElementById('honeyType').value,
+            honey_grade: document.getElementById('honeyGrade').value,
+            notes: document.getElementById('harvestNotes').value
+        };
+
+        try {
+            const response = await fetch('/api/harvests', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(harvestData)
+            });
+
+            if (response.ok) {
+                alert('Harvest recorded successfully!');
+                bootstrap.Modal.getInstance(document.getElementById('harvestModal')).hide();
+                document.getElementById('harvestForm').reset();
+            } else {
+                alert('Failed to record harvest');
+            }
+        } catch (error) {
+            alert('Error recording harvest');
+        }
+    }
+
     // Show admin link only for admins
     fetch('/api/auth/me').then(r=>r.json()).then(d=>{
         if(d && d.user && d.user.role === 'admin'){
@@ -276,6 +800,17 @@
             const li4 = document.getElementById('adminTipsLink');
             if(li4) li4.style.display = '';
         }
+        
+        // Initialize dashboard enhancements
+        initPerformanceChart();
+        loadUpcomingTasks();
+        loadHivePerformance();
+        
+        // Auto-refresh every 30 seconds
+        setInterval(() => {
+            loadUpcomingTasks();
+            loadHivePerformance();
+        }, 30000);
         
         // Update user profile info
         if(d && d.user) {
@@ -317,12 +852,20 @@
             }
         });
 
+        // Show admin quick actions for admin users
+        fetch('/api/auth/me').then(r=>r.json()).then(d=>{
+            if(d && d.user && d.user.role === 'admin'){
+                const adminQuickActions = document.getElementById('adminQuickActions');
+                if(adminQuickActions) adminQuickActions.style.display = 'block';
+            }
+        }).catch(()=>{});
+
         // Universal logout functionality
         const logoutBtn = document.getElementById('logoutBtn');
         if (logoutBtn) {
             logoutBtn.addEventListener('click', async function(e) {
                 e.preventDefault();
-                if (confirm('Are you sure you want to logout?')) {
+                if (confirm('🔒 Are you sure you want to logout from Smart Hive Solution?\n\nYou will be redirected to the login page.\n\nClick OK to confirm logout.')) {
                     try {
                         await fetch('/api/auth/logout', { method: 'POST' });
                         // Clear any stored data

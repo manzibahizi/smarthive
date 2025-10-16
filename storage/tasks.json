@@ -1,0 +1,15 @@
+[
+    {
+        "id": "68f06301f1be5",
+        "type": "inspection",
+        "title": "Health Inspection - Hive ",
+        "description": "Scheduled inspection for Hive ",
+        "hive_id": "",
+        "inspection_type": "health",
+        "priority": "urgent",
+        "scheduled_date": "2025-10-16T03:14",
+        "notes": "",
+        "completed": false,
+        "created_at": "2025-10-16T05:14:09+02:00"
+    }
+]

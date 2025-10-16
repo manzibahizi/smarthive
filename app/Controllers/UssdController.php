@@ -88,7 +88,7 @@ class UssdController
         // TODO: Implement AI recommendations
         $recommendations = "Recommendations:\n";
         $recommendations .= "1. Check hive ventilation\n";
-        $recommendations .= "2. Monitor honey levels\n";
+        $recommendations .= "2. Monitor hive weight levels\n";
         $recommendations .= "3. Schedule inspection";
         return $recommendations;
     }
@@ -99,7 +99,7 @@ class UssdController
         $resources .= "1. Basic Beekeeping\n";
         $resources .= "2. Hive Management\n";
         $resources .= "3. Disease Prevention\n";
-        $resources .= "4. Honey Production";
+        $resources .= "4. Hive Weight";
         return $resources;
     }
 
