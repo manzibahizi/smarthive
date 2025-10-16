@@ -1,7 +1,4 @@
-# Smart Hive Solution - Docker Ignore File
-# This file tells Docker what to exclude from the build context
-
-# Git files
+# Git
 .git
 .gitignore
 .gitattributes
@@ -11,12 +8,24 @@ README.md
 *.md
 docs/
 
-# Development files
+# Build artifacts
+build/
+node_modules/
+vendor/
+
+# Environment files
 .env
 .env.local
-.env.development
-.env.test
 .env.production
+
+# Logs
+*.log
+logs/
+storage/logs/
+
+# Cache
+storage/cache/
+storage/sessions/
 
 # IDE files
 .vscode/
@@ -30,53 +39,22 @@ docs/
 Thumbs.db
 desktop.ini
 
-# Logs
-*.log
-logs/
-storage/logs/
-
-# Cache
-cache/
+# Temporary files
 tmp/
 temp/
+*.tmp
 
-# Node modules (if any)
-node_modules/
-npm-debug.log*
+# Docker files
+Dockerfile*
+docker-compose*.yml
+.dockerignore
 
-# Composer dev dependencies
-vendor/bin/
-vendor/composer/
-vendor/doctrine/
-vendor/myclabs/
-vendor/nikic/
-vendor/phar-io/
-vendor/phpunit/
-vendor/sebastian/
-vendor/theseer/
+# Development files
+composer.lock
+package-lock.json
+yarn.lock
 
 # Test files
 tests/
 phpunit.xml
 .phpunit.result.cache
-
-# Backup files
-*.bak
-*.backup
-storage/backup_*
-
-# Docker files (don't include docker config in image)
-docker/
-docker-compose.yml
-docker-compose.override.yml
-docker-setup.sh
-docker-setup.bat
-docker-commands.txt
-
-# Deployment files
-deploy.sh
-render.yaml
-Procfile
-
-# Development scripts
-test_registration.php
