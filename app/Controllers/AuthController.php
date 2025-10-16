@@ -5,99 +5,235 @@ namespace App\Controllers;
 use App\Database;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Kreait\Firebase\Exception\Auth\FailedToVerifyToken;
+use Kreait\Firebase\Exception\Auth\UserNotFound;
 
 class AuthController
 {
     public function register(Request $request, Response $response): Response
     {
         $data = $request->getParsedBody();
-        // TODO: Validate input, create user in database, and return success/error
-        $responseData = [
-            'status' => 'success',
-            'message' => 'User registered successfully'
-        ];
-        $response->getBody()->write(json_encode($responseData));
-        return $response->withHeader('Content-Type', 'application/json');
+        $email = trim($data['email'] ?? '');
+        $password = trim($data['password'] ?? '');
+        $username = trim($data['username'] ?? '');
+        $role = trim($data['role'] ?? 'user');
+
+        if ($email === '' || $password === '' || $username === '') {
+            $response->getBody()->write(json_encode([
+                'status' => 'error', 
+                'message' => 'Email, username, and password are required'
+            ]));
+            return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
+        }
+
+        try {
+            $auth = Database::getAuth();
+            $firestore = Database::getFirestoreClient();
+
+            // Create user in Firebase Auth
+            $userRecord = $auth->createUser([
+                'email' => $email,
+                'password' => $password,
+                'displayName' => $username,
+            ]);
+
+            // Store additional user data in Firestore
+            $userData = [
+                'uid' => $userRecord->uid,
+                'username' => $username,
+                'email' => $email,
+                'role' => $role,
+                'is_active' => true,
+                'created_at' => new \DateTime(),
+                'updated_at' => new \DateTime(),
+            ];
+
+            $firestore->collection('users')->document($userRecord->uid)->set($userData);
+
+            $response->getBody()->write(json_encode([
+                'status' => 'success',
+                'message' => 'User registered successfully',
+                'user' => [
+                    'uid' => $userRecord->uid,
+                    'username' => $username,
+                    'email' => $email,
+                    'role' => $role
+                ]
+            ]));
+            return $response->withHeader('Content-Type', 'application/json');
+
+        } catch (\Throwable $e) {
+            $response->getBody()->write(json_encode([
+                'status' => 'error', 
+                'message' => 'Registration failed: ' . $e->getMessage()
+            ]));
+            return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
+        }
     }
 
     public function login(Request $request, Response $response): Response
     {
         $data = $request->getParsedBody();
-        $username = trim($data['username'] ?? '');
+        $email = trim($data['email'] ?? '');
         $password = trim($data['password'] ?? '');
 
-        // NOTE: Replace with DB lookup; for now, allow only admin-provisioned style
-        if ($username === '' || $password === '') {
-            $response->getBody()->write(json_encode(['status' => 'error', 'message' => 'Username and password are required']));
+        if ($email === '' || $password === '') {
+            $response->getBody()->write(json_encode([
+                'status' => 'error', 
+                'message' => 'Email and password are required'
+            ]));
             return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
         }
 
-        // Development-only master override to ensure access even without DB
-        // Customize via env MASTER_USERNAME / MASTER_PASSWORD
-        $masterUsername = getenv('MASTER_USERNAME') !== false ? getenv('MASTER_USERNAME') : 'Admin';
-        $masterPassword = getenv('MASTER_PASSWORD') !== false ? getenv('MASTER_PASSWORD') : 'Admin123';
-        if ($username === $masterUsername && $password === $masterPassword) {
-            $_SESSION['user'] = [
-                'id' => 0,
-                'username' => $masterUsername,
-                'role' => 'admin'
-            ];
-            $response->getBody()->write(json_encode(['status' => 'success']));
-            return $response->withHeader('Content-Type', 'application/json');
-        }
-
-        // DB auth
         try {
-            $pdo = Database::getConnection();
-            // Ensure users table exists and seed admin
-            $this->migrate($pdo);
+            $auth = Database::getAuth();
+            $firestore = Database::getFirestoreClient();
 
-            $stmt = $pdo->prepare('SELECT id, username, password_hash, role, is_active FROM users WHERE username = :u LIMIT 1');
-            $stmt->execute([':u' => $username]);
-            $user = $stmt->fetch();
+            // Sign in with email and password
+            $signInResult = $auth->signInWithEmailAndPassword($email, $password);
+            $uid = $signInResult->firebaseUserId();
 
-            if (!$user || !$user['is_active']) {
-                throw new \RuntimeException('Invalid credentials');
+            // Get user data from Firestore
+            $userDoc = $firestore->collection('users')->document($uid)->snapshot();
+            
+            if (!$userDoc->exists()) {
+                throw new \RuntimeException('User data not found');
             }
 
-            if (!password_verify($password, $user['password_hash'])) {
-                throw new \RuntimeException('Invalid credentials');
+            $userData = $userDoc->data();
+            
+            if (!$userData['is_active']) {
+                throw new \RuntimeException('Account is deactivated');
             }
 
+            // Store user session
             $_SESSION['user'] = [
-                'id' => (int)$user['id'],
-                'username' => $user['username'],
-                'role' => $user['role']
+                'uid' => $uid,
+                'username' => $userData['username'],
+                'email' => $userData['email'],
+                'role' => $userData['role']
             ];
 
-            $response->getBody()->write(json_encode(['status' => 'success']));
+            $response->getBody()->write(json_encode([
+                'status' => 'success',
+                'user' => [
+                    'uid' => $uid,
+                    'username' => $userData['username'],
+                    'email' => $userData['email'],
+                    'role' => $userData['role']
+                ]
+            ]));
             return $response->withHeader('Content-Type', 'application/json');
+
         } catch (\Throwable $e) {
-            $response->getBody()->write(json_encode(['status' => 'error', 'message' => 'Invalid credentials']));
+            $response->getBody()->write(json_encode([
+                'status' => 'error', 
+                'message' => 'Invalid credentials'
+            ]));
             return $response->withStatus(401)->withHeader('Content-Type', 'application/json');
         }
     }
 
-    private function migrate(\PDO $pdo): void
+    public function logout(Request $request, Response $response): Response
     {
-        $pdo->exec('CREATE TABLE IF NOT EXISTS users (
-            id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-            username VARCHAR(100) NOT NULL UNIQUE,
-            password_hash VARCHAR(255) NOT NULL,
-            role ENUM("admin","user") NOT NULL DEFAULT "user",
-            is_active TINYINT(1) NOT NULL DEFAULT 1,
-            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;');
+        session_destroy();
+        $response->getBody()->write(json_encode([
+            'status' => 'success',
+            'message' => 'Logged out successfully'
+        ]));
+        return $response->withHeader('Content-Type', 'application/json');
+    }
 
-        // Seed default admin if not present
-        $stmt = $pdo->prepare('SELECT COUNT(*) FROM users WHERE username = :u');
-        $stmt->execute([':u' => 'Admin']);
-        $exists = (int)$stmt->fetchColumn();
-        if ($exists === 0) {
-            $hash = password_hash('Admin123', PASSWORD_BCRYPT);
-            $ins = $pdo->prepare('INSERT INTO users (username, password_hash, role, is_active) VALUES (:u, :p, "admin", 1)');
-            $ins->execute([':u' => 'Admin', ':p' => $hash]);
+    public function verifyToken(Request $request, Response $response): Response
+    {
+        $data = $request->getParsedBody();
+        $idToken = $data['idToken'] ?? '';
+
+        if ($idToken === '') {
+            $response->getBody()->write(json_encode([
+                'status' => 'error', 
+                'message' => 'ID token is required'
+            ]));
+            return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
+        }
+
+        try {
+            $auth = Database::getAuth();
+            $verifiedToken = $auth->verifyIdToken($idToken);
+            $uid = $verifiedToken->claims()->get('sub');
+
+            // Get user data from Firestore
+            $firestore = Database::getFirestoreClient();
+            $userDoc = $firestore->collection('users')->document($uid)->snapshot();
+            
+            if (!$userDoc->exists()) {
+                throw new \RuntimeException('User data not found');
+            }
+
+            $userData = $userDoc->data();
+
+            $response->getBody()->write(json_encode([
+                'status' => 'success',
+                'user' => [
+                    'uid' => $uid,
+                    'username' => $userData['username'],
+                    'email' => $userData['email'],
+                    'role' => $userData['role']
+                ]
+            ]));
+            return $response->withHeader('Content-Type', 'application/json');
+
+        } catch (FailedToVerifyToken $e) {
+            $response->getBody()->write(json_encode([
+                'status' => 'error', 
+                'message' => 'Invalid token'
+            ]));
+            return $response->withStatus(401)->withHeader('Content-Type', 'application/json');
+        } catch (\Throwable $e) {
+            $response->getBody()->write(json_encode([
+                'status' => 'error', 
+                'message' => 'Token verification failed'
+            ]));
+            return $response->withStatus(401)->withHeader('Content-Type', 'application/json');
+        }
+    }
+
+    public function createDefaultAdmin(): void
+    {
+        try {
+            $auth = Database::getAuth();
+            $firestore = Database::getFirestoreClient();
+
+            // Check if admin user exists
+            $adminQuery = $firestore->collection('users')
+                ->where('role', '=', 'admin')
+                ->limit(1);
+            
+            $adminDocs = $adminQuery->documents();
+            
+            if ($adminDocs->isEmpty()) {
+                // Create default admin user
+                $userRecord = $auth->createUser([
+                    'email' => 'admin@smarthive.com',
+                    'password' => 'Admin123',
+                    'displayName' => 'Admin',
+                ]);
+
+                $userData = [
+                    'uid' => $userRecord->uid,
+                    'username' => 'Admin',
+                    'email' => 'admin@smarthive.com',
+                    'role' => 'admin',
+                    'is_active' => true,
+                    'created_at' => new \DateTime(),
+                    'updated_at' => new \DateTime(),
+                ];
+
+                $firestore->collection('users')->document($userRecord->uid)->set($userData);
+            }
+        } catch (\Throwable $e) {
+            // Log error but don't throw - this is initialization code
+            error_log('Failed to create default admin: ' . $e->getMessage());
         }
     }
 } 
