@@ -6,15 +6,15 @@
 
 /* Orange theme variables */
 :root {
-    --primary-color: #ff6b35;
-    --secondary-color: #ff8c42;
-    --accent-color: #e55a2b;
+    --primary-color: #ff8c00;
+    --secondary-color: #ffa500;
+    --accent-color: #ff7f00;
     --dark-color: #2d1b1b;
     --darker-color: #1a0f0f;
     --light-bg: #fff8f5;
-    --border-color: #ffb399;
-    --navbar-color: #ff6b35;
-    --header-color: #ff6b35;
+    --border-color: #ffb366;
+    --navbar-color: #ff8c00;
+    --header-color: #ff8c00;
 }
 
 /* Global look and feel */
@@ -48,7 +48,7 @@ body {
     max-width: 220px;
     min-height: 100vh;
     transition: all 0.3s ease;
-    background: var(--primary-color);
+    background: #4a4a4a;
     color: #ffffff;
     overflow-y: auto;
     display: flex;
@@ -188,10 +188,11 @@ body {
 }
 
 #sidebar ul li.active > a, #sidebar ul li a.active {
-    background: rgba(255,255,255,0.2);
-    border-left-color: #ffffff;
+    background: #6a6a6a;
+    border-left-color: var(--primary-color);
     border-left-width: 4px;
     color: #ffffff;
+    border-radius: 4px;
 }
 
 #sidebar ul li.active > a i, #sidebar ul li a.active i {
@@ -235,9 +236,10 @@ body {
 
 .navbar {
     padding: 12px 16px;
-    background: var(--navbar-color);
+    background: #4a4a4a;
     color: #fff;
-    border-bottom: 3px solid var(--accent-color);
+    border-bottom: 3px solid var(--primary-color);
+    border-top: 1px solid #f5f5dc;
 }
 
 .navbar .navbar-brand, .navbar .nav-link {
@@ -246,7 +248,7 @@ body {
 
 .navbar .nav-link:hover, .navbar .nav-link.active {
     color: #ffffff;
-    background: rgba(255,255,255,0.2);
+    background: #6a6a6a;
     border-radius: 4px;
 }
 
