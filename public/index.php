@@ -407,6 +407,24 @@ if (strpos($path, '/api/') === 0) {
         jsonResponse(['status' => 'success', 'training' => $newTraining]);
     }
 
+    // Training detail route
+    if (preg_match('/^\/api\/training\/(\d+)$/', $path, $matches) && $requestMethod === 'GET') {
+        requireAuth();
+        $trainingId = (int)$matches[1];
+        $trainingFile = __DIR__ . '/../storage/training.json';
+        $training = file_exists($trainingFile) ? json_decode(file_get_contents($trainingFile), true) : [];
+        
+        $resource = null;
+        foreach ($training as $item) {
+            if ($item['id'] == $trainingId) {
+                $resource = $item;
+                break;
+            }
+        }
+        
+        jsonResponse(['status' => 'success', 'resource' => $resource]);
+    }
+
     // Tips routes
     if ($path === '/api/tips' && $requestMethod === 'GET') {
         requireAuth();

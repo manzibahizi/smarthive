@@ -1,18 +1,5 @@
 [
     {
-        "id": 3,
-        "name": "RWANDA",
-        "device_id": "123tgnmsd452",
-        "location": "nyarugenge",
-        "description": "i want my hive to be active in the system",
-        "owner_id": "6",
-        "owner_name": "",
-        "status": "active",
-        "created_at": "2025-09-25T16:37:27+02:00",
-        "approved_at": "2025-09-25T16:46:20+02:00",
-        "approved_by": "0"
-    },
-    {
         "id": 4,
         "name": "KIRENGA",
         "device_id": "123hijdci454rredf",
@@ -26,11 +13,11 @@
         "approved_by": "0"
     },
     {
-        "id": 3,
-        "name": "manz",
-        "location": "musanze",
+        "id": 2,
+        "name": "tumba",
+        "location": "RUSIZI\/KMB",
         "created_by": "Admin",
-        "created_at": "2025-10-16T21:13:38+02:00",
+        "created_at": "2025-10-16T21:37:16+02:00",
         "status": "active"
     }
 ]

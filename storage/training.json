@@ -17,10 +17,12 @@
     },
     {
         "id": 5,
-        "title": "Hive Management",
-        "description": "Inspections, pest control, seasonal tasks.",
-        "date": "2025-10-07",
-        "published": true
+        "title": "basic for hive monitoring and pest protection",
+        "description": "hshhsd",
+        "date": "2025-10-17",
+        "published": true,
+        "active": true,
+        "updated_at": "2025-10-16T21:33:40+02:00"
     },
     {
         "id": 6,
@@ -29,5 +31,21 @@
         "date": "2025-10-21",
         "published": false,
         "created_at": "2025-10-16T04:41:46+02:00"
+    },
+    {
+        "id": 5,
+        "title": "basic for hive monitoring and pest protection",
+        "description": "hshhsd",
+        "date": "2025-10-17",
+        "published": false,
+        "created_at": "2025-10-16T21:32:49+02:00"
+    },
+    {
+        "id": 6,
+        "title": "basic for pest managment",
+        "description": "you will learn more",
+        "date": "2025-10-17",
+        "published": true,
+        "created_at": "2025-10-16T21:33:32+02:00"
     }
 ]

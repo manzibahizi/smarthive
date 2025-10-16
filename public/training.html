@@ -54,7 +54,7 @@
                             <h3 class="mb-0"><i class="fas fa-graduation-cap me-2"></i>Training Resources</h3>
                             <div class="d-flex gap-2">
                                 <div id="adminButtons" style="display: none;">
-                                    <a href="/admin-training.html" class="btn btn-primary btn-sm">
+                                    <a href="/admin-training.html" class="btn btn-sm" style="background-color: var(--primary-color); color: white; border-color: var(--primary-color);">
                                         <i class="fas fa-plus me-1"></i>Add Training
                                     </a>
                                     <a href="/admin-tips.html" class="btn btn-success btn-sm">
@@ -69,7 +69,7 @@
                         </div>
                         <div class="table-responsive">
                             <table class="table table-hover align-middle">
-                                <thead>
+                                <thead class="table-header-orange">
                                     <tr>
                                         <th>Title</th>
                                         <th>Date</th>
@@ -77,7 +77,9 @@
                                         <th class="text-end">Action</th>
                                     </tr>
                                 </thead>
-                                <tbody id="trainingList"></tbody>
+                                <tbody id="trainingList">
+                                    <!-- Training items will be loaded here -->
+                                </tbody>
                             </table>
                         </div>
                     </div>
@@ -178,18 +180,25 @@
 
         function renderList(items){
             listEl.innerHTML = '';
-            if(!items || items.length === 0){
+            // Filter to only show published training
+            const publishedItems = items.filter(item => item.published === true);
+            
+            if(!publishedItems || publishedItems.length === 0){
                 const tr = document.createElement('tr');
-                tr.innerHTML = '<td colspan="4" class="text-muted">No training found.</td>';
+                tr.innerHTML = `
+                    <td colspan="4" class="text-center text-muted py-4">
+                        <i class="fas fa-graduation-cap fa-2x mb-2"></i>
+                        <br>No training found.
+                    </td>`;
                 listEl.appendChild(tr);
                 return;
             }
-            items.forEach(item => {
+            publishedItems.forEach(item => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${item.title}</td>
-                    <td>${item.date || ''}</td>
-                    <td>${item.description}</td>
+                    <td><strong>${item.title}</strong></td>
+                    <td><span class="badge bg-info">${item.date || 'No date'}</span></td>
+                    <td>${item.description || 'No description'}</td>
                     <td class="text-end"><button class="btn btn-primary btn-sm" data-id="${item.id}">View</button></td>`;
                 tr.querySelector('button').addEventListener('click', () => loadDetail(item.id));
                 listEl.appendChild(tr);
@@ -200,7 +209,7 @@
             fetch('/api/training')
                 .then(r => r.json())
                 .then(d => {
-                    const resources = (d && d.resources) ? d.resources : [];
+                    const resources = (d && d.training) ? d.training : [];
                     allResources = resources;
                     renderList(resources);
                 })

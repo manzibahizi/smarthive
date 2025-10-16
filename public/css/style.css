@@ -450,6 +450,13 @@ canvas {
     color: #fff;
 }
 
+.table-header-orange th {
+    background: var(--primary-color) !important;
+    color: #fff !important;
+    border-bottom: 2px solid var(--accent-color);
+    font-weight: 600;
+}
+
 /* Status badges */
 .badge.bg-success {
     background: var(--primary-color) !important;
