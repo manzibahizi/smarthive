@@ -208,8 +208,15 @@
             }
         } catch (error) {
             box.className = 'alert alert-danger'; 
-            box.textContent = 'Network error. Please try again.';
+            box.textContent = 'Network error. Please check your connection and try again.';
             console.error('User creation error:', error);
+        } finally {
+            // Re-enable the submit button
+            const submitBtn = document.querySelector('#addUserForm button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-user-plus me-1"></i>Create User';
+            }
         }
     });
     loadUsers();

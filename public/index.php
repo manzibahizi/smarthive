@@ -48,6 +48,45 @@ function requireAuth() {
     return $_SESSION['user'];
 }
 
+// Helper function to validate required fields
+function validateRequired($data, $requiredFields) {
+    $missing = [];
+    foreach ($requiredFields as $field) {
+        if (empty($data[$field])) {
+            $missing[] = $field;
+        }
+    }
+    if (!empty($missing)) {
+        jsonResponse([
+            'status' => 'error', 
+            'message' => 'Missing required fields: ' . implode(', ', $missing)
+        ], 400);
+    }
+}
+
+// Helper function to sanitize input
+function sanitizeInput($data) {
+    if (is_array($data)) {
+        return array_map('sanitizeInput', $data);
+    }
+    return htmlspecialchars(trim($data), ENT_QUOTES, 'UTF-8');
+}
+
+// Helper function to log errors
+function logError($message, $context = []) {
+    $logFile = __DIR__ . '/../storage/logs/error.log';
+    $logDir = dirname($logFile);
+    if (!is_dir($logDir)) {
+        mkdir($logDir, 0755, true);
+    }
+    $timestamp = date('Y-m-d H:i:s');
+    $logMessage = "[$timestamp] $message";
+    if (!empty($context)) {
+        $logMessage .= " Context: " . json_encode($context);
+    }
+    file_put_contents($logFile, $logMessage . "\n", FILE_APPEND | LOCK_EX);
+}
+
 // Helper function to check admin role
 function requireAdmin() {
     $user = requireAuth();

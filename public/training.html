@@ -206,25 +206,56 @@
         }
 
         function loadList(){
+            // Show loading state
+            listEl.innerHTML = `
+                <tr>
+                    <td colspan="4" class="text-center py-4">
+                        <i class="fas fa-spinner fa-spin me-2"></i>Loading training resources...
+                    </td>
+                </tr>
+            `;
+            
             fetch('/api/training')
-                .then(r => r.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(d => {
                     const resources = (d && d.training) ? d.training : [];
                     allResources = resources;
                     renderList(resources);
                 })
-                .catch(() => {
-                    listEl.innerHTML = '<div class="col-12 text-danger">Failed to load training resources.</div>';
+                .catch(error => {
+                    console.error('Error loading training:', error);
+                    listEl.innerHTML = `
+                        <tr>
+                            <td colspan="4" class="text-center text-danger py-4">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Failed to load training resources. Please check your connection.
+                            </td>
+                        </tr>
+                    `;
                 });
         }
 
         function loadDetail(id){
+            // Show loading state
+            detailEl.innerHTML = '<div class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i>Loading training details...</div>';
+            detailRow.style.display = '';
+            
             fetch(`/api/training/${id}`)
-                .then(r => r.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(d => {
                     const res = d && d.resource ? d.resource : null;
                     if(!res){
-                        detailRow.style.display = 'none';
+                        detailEl.innerHTML = '<div class="alert alert-warning">Training not found.</div>';
                         return;
                     }
                     const applyCta = `<button id="applyBtn" class="btn btn-success"><i class="fas fa-hand-paper me-1"></i>Apply</button>`;
@@ -279,8 +310,14 @@
                         });
                     }
                 })
-                .catch(() => {
-                    detailEl.innerHTML = '<div class="text-danger">Failed to load training detail.</div>';
+                .catch(error => {
+                    console.error('Error loading training detail:', error);
+                    detailEl.innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Failed to load training details. Please check your connection and try again.
+                        </div>
+                    `;
                     detailRow.style.display = '';
                 });
         }
