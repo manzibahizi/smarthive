@@ -4,15 +4,15 @@
     align-items: stretch;
 }
 
-/* Muted theme variables */
+/* Orange theme variables */
 :root {
-    --primary-color: #6b7280;
-    --secondary-color: #9ca3af;
-    --accent-color: #4b5563;
-    --dark-color: #374151;
-    --darker-color: #1f2937;
-    --light-bg: #f9fafb;
-    --border-color: #d1d5db;
+    --primary-color: #ff6b35;
+    --secondary-color: #ff8c42;
+    --accent-color: #e55a2b;
+    --dark-color: #2d1b1b;
+    --darker-color: #1a0f0f;
+    --light-bg: #fff8f5;
+    --border-color: #ffb399;
 }
 
 /* Global look and feel */
@@ -24,7 +24,7 @@ body {
 }
 
 .login-bg {
-    background: var(--darker-color);
+    background: var(--primary-color);
 }
 
 .btn-primary {
@@ -46,8 +46,8 @@ body {
     max-width: 220px;
     min-height: 100vh;
     transition: all 0.3s ease;
-    background: var(--darker-color);
-    color: #d1d5db;
+    background: var(--primary-color);
+    color: #ffffff;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
@@ -118,7 +118,7 @@ body {
 }
 
 .profile-name {
-    color: var(--secondary-color);
+    color: #ffffff;
     margin: 0 0 3px 0;
     font-size: 0.95rem;
     font-weight: 600;
@@ -163,7 +163,7 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
-    color: #e5e7eb;
+    color: #ffffff;
     text-decoration: none;
     border-left: 3px solid transparent;
     transition: background .2s ease, color .2s ease, border-color .2s ease;
@@ -181,24 +181,24 @@ body {
 }
 
 #sidebar ul li a:hover {
-    background: rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.2);
     color: #ffffff;
 }
 
 #sidebar ul li.active > a, #sidebar ul li a.active {
-    background: rgba(255,255,255,0.09);
-    border-left-color: var(--secondary-color);
+    background: rgba(255,255,255,0.2);
+    border-left-color: #ffffff;
     border-left-width: 4px;
     color: #ffffff;
 }
 
 #sidebar ul li.active > a i, #sidebar ul li a.active i {
-    color: var(--secondary-color);
+    color: #ffffff;
     opacity: 1;
 }
 
 #sidebar .nav-link.active, #sidebar .nav-link:focus {
-    background: #495057;
+    background: rgba(255,255,255,0.2);
 }
 
 #content {
@@ -390,15 +390,15 @@ canvas {
 }
 
 .alert-danger {
-    background: #f3f4f6;
-    color: #374151;
-    border-left: 4px solid #6b7280;
+    background: #fff8f5;
+    color: var(--dark-color);
+    border-left: 4px solid var(--primary-color);
 }
 
 .alert-warning {
-    background: #f9fafb;
-    color: #374151;
-    border-left: 4px solid #6b7280;
+    background: #fff8f5;
+    color: var(--dark-color);
+    border-left: 4px solid var(--secondary-color);
 }
 
 /* Professional hover effects */
@@ -436,15 +436,15 @@ canvas {
 
 /* Status badges */
 .badge.bg-success {
-    background: #6b7280 !important;
+    background: var(--primary-color) !important;
 }
 
 .badge.bg-warning {
-    background: #9ca3af !important;
+    background: var(--secondary-color) !important;
 }
 
 .badge.bg-danger {
-    background: #4b5563 !important;
+    background: var(--accent-color) !important;
 }
 
 /* Professional loading states */
@@ -564,13 +564,13 @@ canvas {
 }
 
 .alert-success {
-    background-color: #f3f4f6;
-    color: #374151;
+    background-color: #fff8f5;
+    color: var(--dark-color);
 }
 
 .alert-danger {
-    background-color: #f3f4f6;
-    color: #374151;
+    background-color: #fff8f5;
+    color: var(--dark-color);
 }
 
 /* Icon improvements */
