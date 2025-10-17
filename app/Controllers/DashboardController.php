@@ -12,7 +12,7 @@ class DashboardController
 
     public function __construct()
     {
-        $this->firestore = Database::getFirestoreClient();
+        $this->firestore = Database::getFirestore();
     }
 
     public function index(Request $request, Response $response): Response

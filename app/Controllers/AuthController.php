@@ -28,7 +28,7 @@ class AuthController
 
         try {
             $auth = Database::getAuth();
-            $firestore = Database::getFirestoreClient();
+            $firestore = Database::getFirestore();
 
             // Create user in Firebase Auth
             $userRecord = $auth->createUser([
@@ -87,7 +87,7 @@ class AuthController
 
         try {
             $auth = Database::getAuth();
-            $firestore = Database::getFirestoreClient();
+            $firestore = Database::getFirestore();
 
             // Sign in with email and password
             $signInResult = $auth->signInWithEmailAndPassword($email, $password);
@@ -163,7 +163,7 @@ class AuthController
             $uid = $verifiedToken->claims()->get('sub');
 
             // Get user data from Firestore
-            $firestore = Database::getFirestoreClient();
+            $firestore = Database::getFirestore();
             $userDoc = $firestore->collection('users')->document($uid)->snapshot();
             
             if (!$userDoc->exists()) {
@@ -202,7 +202,7 @@ class AuthController
     {
         try {
             $auth = Database::getAuth();
-            $firestore = Database::getFirestoreClient();
+            $firestore = Database::getFirestore();
 
             // Check if admin user exists
             $adminQuery = $firestore->collection('users')

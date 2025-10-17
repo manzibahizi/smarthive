@@ -4,9 +4,7 @@
     "type": "project",
     "require": {
         "php": "^8.0",
-        "heroku/heroku-buildpack-php": "*",
-        "kreait/firebase-php": "^6.0",
-        "google/cloud-firestore": "^1.0"
+        "heroku/heroku-buildpack-php": "*"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5"

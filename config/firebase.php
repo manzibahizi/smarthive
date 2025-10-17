@@ -9,10 +9,10 @@ return [
     'appId' => getenv('FIREBASE_APP_ID') ?: '1:643846748725:web:4ab269aa31291bc2168f7c',
     'measurementId' => getenv('FIREBASE_MEASUREMENT_ID') ?: 'G-REY86XLJZG',
     
+    // Database URL (for Realtime Database)
+    'databaseUrl' => getenv('FIREBASE_DATABASE_URL') ?: 'https://smart-hive-e94ca-default-rtdb.firebaseio.com/',
+    
     // Service Account Key (for server-side operations)
     'serviceAccountKey' => getenv('FIREBASE_SERVICE_ACCOUNT_KEY') ?: null,
     'serviceAccountKeyPath' => getenv('FIREBASE_SERVICE_ACCOUNT_KEY_PATH') ?: null,
-    
-    // Database URL (for Realtime Database if used)
-    'databaseUrl' => getenv('FIREBASE_DATABASE_URL') ?: null,
 ];
