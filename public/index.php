@@ -274,31 +274,104 @@ if (strpos($path, '/api/') === 0) {
     // Hive routes
     if ($path === '/api/hives' && $requestMethod === 'GET') {
         requireAuth();
-        $hivesFile = __DIR__ . '/../storage/hives.json';
-        $hives = file_exists($hivesFile) ? json_decode(file_get_contents($hivesFile), true) : [];
-        jsonResponse(['status' => 'success', 'hives' => $hives]);
+        
+        try {
+            // Use Firebase to get hives
+            require_once __DIR__ . '/../app/Controllers/HiveController.php';
+            $hiveController = new \App\Controllers\HiveController();
+            
+            // Create a mock request object
+            $request = new class {
+                public function getParsedBody() { return []; }
+            };
+            
+            // Create a mock response object
+            $response = new class {
+                private $body = '';
+                private $status = 200;
+                private $headers = [];
+                
+                public function getBody() { return $this; }
+                public function write($data) { $this->body = $data; return $this; }
+                public function withStatus($status) { $this->status = $status; return $this; }
+                public function withHeader($name, $value) { $this->headers[$name] = $value; return $this; }
+                public function getContent() { return $this->body; }
+                public function getStatus() { return $this->status; }
+            };
+            
+            $result = $hiveController->list($request, $response);
+            
+            // Parse the response
+            $responseData = json_decode($result->getContent(), true);
+            
+            if ($result->getStatus() >= 400) {
+                jsonResponse($responseData, $result->getStatus());
+            } else {
+                jsonResponse($responseData);
+            }
+            
+        } catch (\Throwable $e) {
+            // Fallback to JSON file if Firebase fails
+            $hivesFile = __DIR__ . '/../storage/hives.json';
+            $hives = file_exists($hivesFile) ? json_decode(file_get_contents($hivesFile), true) : [];
+            jsonResponse(['status' => 'success', 'hives' => $hives]);
+        }
     }
 
     if ($path === '/api/hives' && $requestMethod === 'POST') {
         $user = requireAuth();
         $data = getRequestData();
         
-        $hivesFile = __DIR__ . '/../storage/hives.json';
-        $hives = file_exists($hivesFile) ? json_decode(file_get_contents($hivesFile), true) : [];
+        // Validate required fields
+        $name = trim($data['name'] ?? '');
+        $device_id = trim($data['device_id'] ?? '');
+        $location = trim($data['location'] ?? '');
+        $description = trim($data['description'] ?? '');
         
-        $newHive = [
-            'id' => count($hives) + 1,
-            'name' => $data['name'] ?? 'New Hive',
-            'location' => $data['location'] ?? '',
-            'created_by' => $user['username'],
-            'created_at' => date('c'),
-            'status' => 'active'
-        ];
+        if (empty($name) || empty($device_id)) {
+            jsonResponse(['status' => 'error', 'message' => 'Name and device_id are required'], 400);
+        }
         
-        $hives[] = $newHive;
-        file_put_contents($hivesFile, json_encode($hives, JSON_PRETTY_PRINT));
-        
-        jsonResponse(['status' => 'success', 'hive' => $newHive]);
+        try {
+            // Use Firebase to create hive
+            require_once __DIR__ . '/../app/Controllers/HiveController.php';
+            $hiveController = new \App\Controllers\HiveController();
+            
+            // Create a mock request object
+            $request = new class($data) {
+                private $data;
+                public function __construct($data) { $this->data = $data; }
+                public function getParsedBody() { return $this->data; }
+            };
+            
+            // Create a mock response object
+            $response = new class {
+                private $body = '';
+                private $status = 200;
+                private $headers = [];
+                
+                public function getBody() { return $this; }
+                public function write($data) { $this->body = $data; return $this; }
+                public function withStatus($status) { $this->status = $status; return $this; }
+                public function withHeader($name, $value) { $this->headers[$name] = $value; return $this; }
+                public function getContent() { return $this->body; }
+                public function getStatus() { return $this->status; }
+            };
+            
+            $result = $hiveController->create($request, $response, []);
+            
+            // Parse the response
+            $responseData = json_decode($result->getContent(), true);
+            
+            if ($result->getStatus() >= 400) {
+                jsonResponse($responseData, $result->getStatus());
+            } else {
+                jsonResponse($responseData);
+            }
+            
+        } catch (\Throwable $e) {
+            jsonResponse(['status' => 'error', 'message' => 'Failed to create hive: ' . $e->getMessage()], 500);
+        }
     }
 
     if (preg_match('#^/api/hives/(\d+)$#', $path, $matches) && $requestMethod === 'DELETE') {
